@@ -1,5 +1,7 @@
 # Little Sprout
 
+[Open the live project](https://jp4890-coder.github.io/MSTU-5003-5013-project/)
+
 ## Original idea
 
 I wanted to make a simple meal-planning tool for parents and caregivers. They choose foods their child may be open to, get a recipe idea with an explanation, and can optionally explore one new food. They can also save meals they serve and review them later.
