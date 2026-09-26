@@ -278,6 +278,24 @@ function addText(parent, tag, className, text) {
   return node;
 }
 
+const tryFoodCategory = {
+  Fruit: 'Dairy', Dairy: 'Fruit', Protein: 'Vegetables', Vegetables: 'Grains', Grains: 'Vegetables'
+};
+
+function chooseTryFood(meal, selectedFoods) {
+  const usedFoods = new Set([...meal.foods, ...selectedFoods, ...meal.ingredients.split(/\s*[·,]\s*/)]);
+  const anchors = meal.matched.map(name => foods.find(food => food.name === name)).filter(Boolean);
+  for (const anchor of anchors) {
+    const category = tryFoodCategory[anchor.category];
+    const options = foods.filter(food => food.category === category
+      && !usedFoods.has(food.name)
+      && !meal.ingredients.toLowerCase().includes(food.name.toLowerCase()));
+    if (options.length) return options[meal.name.length % options.length];
+  }
+  return foods.find(food => !usedFoods.has(food.name)
+    && !meal.ingredients.toLowerCase().includes(food.name.toLowerCase()));
+}
+
 function renderMeal(meal) {
   result.replaceChildren();
   const feature = document.createElement('div');
@@ -320,6 +338,22 @@ function renderMeal(meal) {
     steps.append(item);
   });
   recipe.append(steps);
+
+  const tryFood = chooseTryFood(meal, selectedNames());
+  if (tryFood) {
+    const exploration = document.createElement('details');
+    exploration.className = 'try-new';
+    const explorationSummary = document.createElement('summary');
+    addText(explorationSummary, 'span', 'try-new-title', 'Try something new');
+    addText(explorationSummary, 'span', 'try-new-optional', 'Optional');
+    exploration.append(explorationSummary);
+    const explorationContent = document.createElement('div');
+    explorationContent.className = 'try-new-content';
+    addText(explorationContent, 'p', 'try-new-food', `${tryFood.icon} ${tryFood.name}`);
+    addText(explorationContent, 'p', 'try-new-copy', 'If it feels right, offer this food separately alongside the meal, prepared in a texture your child can manage. It’s okay to skip it.');
+    exploration.append(explorationContent);
+    recipe.append(exploration);
+  }
 
   const form = document.createElement('form');
   form.className = 'offer-form';
