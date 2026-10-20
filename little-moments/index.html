@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Little Moments | Scenario Practice</title>
+  <style>
+
+    /* Colors and shared sizing */
+    :root {
+      --cream: #f7f5ef;
+      --sage: #426452;
+      --sage-light: #edf3ed;
+      --ink: #293a32;
+      --muted: #616c64;
+      --border: #dce2d9;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+
+    /* Keep the header and content aligned */
+    .site-header {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 30px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .app-name {
+      color: var(--sage);
+      font-family: Georgia, serif;
+      font-size: 27px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+
+    /* A profile row, a wide scenario, then response choices */
+    .practice-layout {
+      max-width: 960px;
+      margin: 44px auto 64px;
+      padding: 0 28px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .profile-card, .scenario-card {
+      border: 1px solid var(--border);
+      border-radius: 22px;
+    }
+
+    .profile-card {
+      display: grid;
+      grid-template-columns: 140px minmax(0, 1fr);
+      gap: 28px;
+      align-items: center;
+      padding: 28px;
+      background: var(--sage-light);
+    }
+    .profile-content { min-width: 0; }
+    .profile-details { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 20px; }
+    .profile-details dt { grid-row: 1; }
+    .profile-details dd { grid-row: 2; }
+    .scenario-question { margin: 14px 0 24px; font-size: 21px; }
+    .scenario-card { text-align: center; }
+    .response-section { padding: 0 12px; }
+
+    .scenario-card {
+      padding: 36px;
+      background: #fffefa;
+      box-shadow: 0 8px 32px rgba(41, 58, 50, 0.04);
+    }
+
+    .profile-avatar {
+      display: grid;
+      place-items: center;
+      width: 140px;
+      height: 140px;
+      margin-bottom: 0;
+      border-radius: 20px;
+      background: #d7e3d4;
+      color: var(--sage);
+      font-family: Georgia, serif;
+      font-size: 56px;
+    }
+
+    h1, h2 { margin: 0; line-height: 1.2; }
+    h1 { font-family: Georgia, serif; font-size: clamp(30px, 4vw, 40px); font-weight: normal; }
+    h2 { font-size: 24px; }
+    .child-age { display: inline-block; margin-left: 12px; font-size: 16px; font-weight: normal; color: var(--muted); }
+    .profile-details { margin: 0; }
+    dt { margin-top: 12px; font-size: 13px; font-weight: 700; color: var(--sage); }
+    dd { margin: 5px 0 0; font-size: 15px; }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--sage);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .scenario-description {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 24px;
+      background: var(--cream);
+      border-left: 3px solid #b7c7b4;
+      border-right: 3px solid #b7c7b4;
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 18px;
+      text-align: left;
+    }
+    .response-options { margin: 0; padding: 0; border: 0; min-width: 0; }
+    legend { padding: 0; font-size: 21px; font-weight: 650; }
+    #response-hint { margin: 8px 0 20px; color: var(--muted); font-size: 14px; }
+
+    /* Native radio inputs work without JavaScript */
+    .response-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 12px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: white;
+      cursor: pointer;
+    }
+
+    .response-option input {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      margin: 4px 0 0;
+      accent-color: var(--sage);
+    }
+
+    .response-option strong { color: var(--sage); margin-right: 5px; }
+    .response-option:hover { border-color: #8da48e; background: #f8faf6; }
+    .response-option:has(input:checked) { border-color: var(--sage); background: var(--sage-light); }
+    .response-option:focus-within { outline: 3px solid #8da48e; outline-offset: 3px; }
+
+    .feedback-button {
+      margin-top: 16px;
+      padding: 14px 26px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--sage);
+      color: white;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .feedback-button:hover { background: #334f40; }
+    .feedback-button:focus-visible, .app-name:focus-visible {
+      outline: 3px solid #8da48e;
+      outline-offset: 4px;
+    }
+    .prototype-note { margin: 14px 0 0; font-size: 12px; color: var(--muted); }
+
+    /* Feedback appears after a response is submitted. */
+    .feedback-panel {
+      margin-top: 24px;
+      padding: 24px;
+      background: var(--sage-light);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--sage);
+      border-radius: 13px;
+    }
+    .feedback-panel h2 { font-size: 21px; }
+    .feedback-panel p:last-child { margin-bottom: 0; }
+    .selection-message { color: var(--sage); font-weight: 600; }
+
+    /* Stack the cards on phones and smaller tablets */
+    @media (max-width: 760px) {
+      .site-header { padding: 22px 20px; flex-wrap: wrap; }
+      .app-name { font-size: 24px; }
+      .practice-layout { grid-template-columns: 1fr; margin-top: 24px; padding: 0 20px; gap: 20px; }
+      .profile-card, .scenario-card { padding: 24px; }
+      .feedback-button { width: 100%; }
+      .profile-card { grid-template-columns: 80px minmax(0, 1fr); gap: 18px; }
+      .profile-avatar { width: 80px; height: 100px; font-size: 40px; align-self: start; }
+      .profile-details { display: block; }
+      .child-age { display: block; margin: 8px 0 0; }
+      .response-section { padding: 0; }
+      .scenario-description { padding: 18px; font-size: 16px; }
+    }
+
+    .header-nav { display: flex; flex-wrap: wrap; gap: 18px; }
+    .header-nav a { color: var(--sage); font-size: 14px; text-underline-offset: 5px; }
+    [hidden] { display: none !important; }
+    .parent-layout { max-width: 840px; margin: 40px auto 64px; padding: 0 24px; }
+    .intro { color: var(--muted); max-width: 620px; }
+    .profile-form { margin-top: 28px; }
+    .form-section { margin: 0 0 22px; padding: 26px; border: 1px solid var(--border); border-radius: 18px; background: #fffefa; min-width: 0; }
+    .form-section legend { padding: 0 8px; font-size: 19px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .form-field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 18px; }
+    .form-field:last-child { margin-bottom: 0; }
+    .form-field label { font-size: 16px; font-weight: 600; }
+    .form-field input, .form-field select, .form-field textarea { width: 100%; padding: 12px; border: 1px solid #aebbae; border-radius: 9px; background: white; color: var(--ink); font: inherit; }
+    .form-field textarea { min-height: 90px; resize: vertical; }
+    .form-field :is(input, select, textarea):focus { outline: 3px solid #c8d9c7; border-color: var(--sage); }
+    .form-help { color: var(--muted); font-size: 15px; margin: 0; }
+    .form-actions { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; }
+    .form-actions .feedback-button { margin: 0; }
+    .form-actions a { color: var(--sage); }
+    .saved-details { margin-top: 20px; color: var(--muted); }
+    .saved-details summary { cursor: pointer; color: var(--sage); }
+    .saved-details dl { margin-bottom: 0; }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .form-section { padding: 20px; } }
+
+    /* Prominent navigation between the two experiences. */
+    .site-header { flex-direction: column; align-items: stretch; gap: 22px; }
+    .header-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 7px; background: #e6ece2; border-radius: 16px; }
+    .header-nav a { padding: 14px 20px; text-align: center; text-decoration: none; font-size: 17px; font-weight: 650; border-radius: 11px; }
+    .header-nav a[aria-current="page"] { background: white; color: #294b38; box-shadow: 0 2px 8px #293a3210; }
+    .header-nav a:hover { background: #f7faf4; }
+    .header-nav a:focus-visible, .next-button:focus-visible { outline: 3px solid #8da48e; outline-offset: 3px; }
+    .scenario-steps { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
+    .scenario-steps span { width: 32px; height: 5px; border-radius: 8px; background: var(--border); }
+    .scenario-steps span.active { background: var(--sage); }
+    .next-button { display: inline-block; margin-top: 18px; padding: 12px 22px; border: 1px solid var(--sage); border-radius: 10px; background: var(--sage); color: white; font: inherit; font-weight: 600; cursor: pointer; }
+    .completion-card { padding: 32px; border: 1px solid var(--border); border-radius: 18px; background: var(--sage-light); }
+    @media (max-width: 440px) { .header-nav a { padding: 12px 6px; font-size: 15px; } }
+
+    .photo-preview { width: 100px; height: 100px; object-fit: cover; border-radius: 16px; }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+    .remove-photo { width: fit-content; padding: 8px 12px; background: white; color: var(--sage); border: 1px solid var(--border); border-radius: 8px; font: inherit; cursor: pointer; }
+    .care-note { margin: 20px 0 0; padding: 16px; border-radius: 12px; background: #f3eadc; }
+
+    .form-section h2 { margin: 0 0 22px; padding-bottom: 16px; border-bottom: 1px solid var(--border); font-size: 20px; font-weight: 650; }
+    .form-section { padding: 28px; }
+    .profile-form select { min-height: 50px; }
+    @media (max-width: 600px) { .form-section { padding: 22px; } }
+
+    .optional-label { margin-left: 8px; font-size: 12px; font-weight: normal; color: var(--muted); }
+    .field-label { font-size: 16px; font-weight: 600; }
+    .multi-select { border: 1px solid #aebbae; border-radius: 9px; background: white; }
+    .multi-select summary { padding: 12px; cursor: pointer; }
+    .multi-select summary:focus-visible { outline: 3px solid #8da48e; outline-offset: 2px; }
+    .checkbox-list { padding: 4px 12px 12px; }
+    .checkbox-list .check-option { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; font-weight: normal; cursor: pointer; }
+    .checkbox-list input[type="checkbox"] { width: 18px; height: 18px; margin: 4px 0 0; padding: 0; flex-shrink: 0; accent-color: var(--sage); }
+    .photo-field { border-top: 1px solid var(--border); padding-top: 18px; margin-top: 20px; }
+    .photo-field input[type="file"] { border: 0; padding: 4px 0; background: transparent; font-size: 14px; }
+    #photo-status:empty { display: none; }
+
+    .sample-tools { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-top: 22px; }
+
+    .scenario-navigation { display: flex; justify-content: flex-end; margin-top: 20px; }
+    .scenario-navigation .next-button { margin-top: 0; }
+
+    .care-note { text-align: left; }
+    .care-note p { margin: 0; }
+    .care-note p + p { margin-top: 12px; }
+
+    .home-link { color: var(--sage); font-size: 14px; width: fit-content; }
+    .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin: 30px 0; }
+    .role-card { padding: 26px; background: #fffefa; border: 1px solid var(--border); border-radius: 20px; }
+    .role-card p { color: var(--muted); }
+    .how-it-works { padding-left: 22px; margin: 28px 0; }
+    .how-it-works li { margin-bottom: 12px; }
+    .invitation-panel { margin-top: 32px; }
+    #invitation-output { margin-top: 24px; }
+    #invitation-code { min-height: 90px; font-size: 13px; overflow-wrap: anywhere; }
+    @media (max-width: 650px) { .role-grid { grid-template-columns: 1fr; } }
+
+    .header-top { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .home-link { padding: 8px 14px; border-radius: 8px; text-decoration: none; font-size: 15px; font-weight: 600; }
+    .home-link:hover, .home-link[aria-current="page"] { background: var(--sage-light); }
+    .home-link:focus-visible { outline: 3px solid #8da48e; outline-offset: 3px; }
+  </style>
+</head>
+
+<body>
+  <!-- App name and practice progress -->
+  <header class="site-header">
+    <div class="header-top">
+      <a class="app-name" href="#home">Little Moments</a>
+      <a class="home-link" href="#home">Home</a>
+    </div>
+    <nav class="header-nav" aria-label="Main navigation">
+      <a href="#profile">Child profile</a>
+      <a href="#caregiver">Caregiver view</a>
+    </nav>
+  </header>
+
+
+
+  <main class="parent-layout" id="welcome-screen" hidden>
+    <p class="eyebrow">A little understanding goes a long way</p>
+    <h1>Small moments. More thoughtful care.</h1>
+    <p class="intro">Every child has their own way of exploring, communicating, and finding comfort. Little Moments helps parents share those details and caregivers practice using them.</p>
+    <ol class="how-it-works"><li><strong>Share what matters.</strong> A parent creates a child profile.</li><li><strong>Invite a caregiver.</strong> Share a code containing the saved profile.</li><li><strong>Explore everyday moments.</strong> The caregiver tries three scenarios and reads feedback connected to the child.</li></ol>
+    <div class="role-grid">
+      <section class="role-card"><h2>For parents</h2><p>Create or update a profile, preview the caregiver experience, and share an invitation.</p><button class="next-button" type="button" id="parent-start">Create a child profile</button></section>
+      <section class="role-card"><h2>For caregivers</h2><p>Enter the invitation code or link a parent shared with you.</p><form id="invitation-form"><div class="form-field"><label for="invitation-input">Invitation code or link</label><textarea id="invitation-input" required spellcheck="false" placeholder="Paste your invitation here"></textarea></div><button class="next-button" type="submit">Open invitation</button><p id="invitation-status" role="status"></p></form></section>
+    </div>
+    <p class="form-help">This prototype works in your browser. Invitations are shareable copies of profile information, not password-protected accounts.</p>
+  </main>
+
+  <main class="parent-layout" id="parent-screen" hidden>
+    <h1>Help us get to know your child</h1>
+    <p class="intro">Choose the options that best describe your child. You can select more than one answer in each checklist. Add anything else in the notes at the end.</p>
+    <p class="intro">Your answers help tailor the caregiving scenarios and feedback, so caregivers can practice responding to everyday situations with your child’s needs in mind.</p>
+    <p class="form-help">Saved only in this browser on this device. All questions are required. Photo and additional notes are optional.</p>
+    <div class="sample-tools"><button type="button" class="remove-photo" id="load-sample">Use Taeha sample</button><button type="button" class="remove-photo" id="clear-profile">Clear profile</button><span class="form-help">A fictional, completed profile for trying all three scenarios.</span></div>
+    <form class="profile-form" id="child-profile-form">
+      <section class="form-section" aria-labelledby="basic-heading"><h2 id="basic-heading">Basic information</h2>
+        <div class="form-grid">
+          <div class="form-field"><label for="child-name">Child’s first name *</label><input id="child-name" name="name" required maxlength="40" autocomplete="off"></div>
+          <div class="form-field"><label for="child-age">Age in months *</label><input id="child-age" name="age" type="number" min="1" max="72" step="1" required aria-describedby="age-help"><p class="form-help" id="age-help">For children ages 1–72 months.</p></div>
+          <div class="form-field"><label for="child-gender">Gender *</label><select id="child-gender" name="gender" required><option value="">Choose a gender</option><option>Boy</option><option>Girl</option><option>Another gender</option><option>Not sure yet</option><option>Prefer not to say</option></select></div>
+          <div class="form-field"><label for="child-pronouns">Pronouns *</label><select id="child-pronouns" name="pronouns" required><option value="">Choose pronouns</option><option value="they">They / them</option><option value="he">He / him</option><option value="she">She / her</option></select></div>
+        </div>
+        <div class="form-field photo-field">
+          <label for="child-photo">Child’s photo <span class="optional-label">Optional</span></label>
+          <input id="child-photo" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="photo-help">
+          <p class="form-help" id="photo-help">You can leave this blank. JPG, PNG, or WebP under 1 MB; saved only in this browser.</p>
+          <img class="photo-preview" id="photo-preview" alt="Selected child photo" hidden>
+          <button type="button" class="remove-photo" id="remove-photo" hidden>Remove photo</button>
+          <p id="photo-status" role="status"></p>
+        </div>
+      </section>
+      <section class="form-section" aria-labelledby="personality-heading"><h2 id="personality-heading">Personality and preferences</h2>
+        <div class="form-field"><label for="child-temperament">How would you describe their temperament? *</label><select id="child-temperament" name="temperament" required><option value="">Choose a description</option><option>Slow to warm up</option><option>Highly active</option><option>Comfortable with new situations</option><option>Varies with the situation</option><option>Still getting to know</option></select></div>
+<div class="form-field"><div id="label-personality" class="field-label">Personality <span aria-hidden="true">*</span></div><details class="multi-select"><summary>Select all that apply</summary><div class="checkbox-list" role="group" aria-labelledby="label-personality"><label class="check-option"><input type="checkbox" name="personality" value="Observant and cautious"><span>Observant and cautious</span></label><label class="check-option"><input type="checkbox" name="personality" value="Active and curious"><span>Active and curious</span></label><label class="check-option"><input type="checkbox" name="personality" value="Calm and easygoing"><span>Calm and easygoing</span></label><label class="check-option"><input type="checkbox" name="personality" value="Expressive and social"><span>Expressive and social</span></label><label class="check-option"><input type="checkbox" name="personality" value="Varies with the situation"><span>Varies with the situation</span></label><label class="check-option"><input type="checkbox" name="personality" value="Other — see additional notes"><span>Other — see additional notes</span></label></div></details></div>
+<div class="form-field"><div id="label-preferences" class="field-label">Favorite activity <span aria-hidden="true">*</span></div><details class="multi-select"><summary>Select all that apply</summary><div class="checkbox-list" role="group" aria-labelledby="label-preferences"><label class="check-option"><input type="checkbox" name="preferences" value="Books and quiet play"><span>Books and quiet play</span></label><label class="check-option"><input type="checkbox" name="preferences" value="Music and movement"><span>Music and movement</span></label><label class="check-option"><input type="checkbox" name="preferences" value="Building and puzzles"><span>Building and puzzles</span></label><label class="check-option"><input type="checkbox" name="preferences" value="Outdoor play"><span>Outdoor play</span></label><label class="check-option"><input type="checkbox" name="preferences" value="Pretend play"><span>Pretend play</span></label><label class="check-option"><input type="checkbox" name="preferences" value="Familiar routines and time to observe"><span>Familiar routines and time to observe</span></label><label class="check-option"><input type="checkbox" name="preferences" value="Other — see additional notes"><span>Other — see additional notes</span></label></div></details></div>
+</section><section class="form-section" aria-labelledby="daily-heading"><h2 id="daily-heading">Daily care</h2><div class="form-field"><div id="label-routines" class="field-label">Routine that helps most <span aria-hidden="true">*</span></div><details class="multi-select"><summary>Select all that apply</summary><div class="checkbox-list" role="group" aria-labelledby="label-routines"><label class="check-option"><input type="checkbox" name="routines" value="A consistent meal and nap schedule"><span>A consistent meal and nap schedule</span></label><label class="check-option"><input type="checkbox" name="routines" value="A warning before transitions"><span>A warning before transitions</span></label><label class="check-option"><input type="checkbox" name="routines" value="A book before bedtime"><span>A book before bedtime</span></label><label class="check-option"><input type="checkbox" name="routines" value="A familiar song or comfort object"><span>A familiar song or comfort object</span></label><label class="check-option"><input type="checkbox" name="routines" value="A flexible routine"><span>A flexible routine</span></label><label class="check-option"><input type="checkbox" name="routines" value="Other — see additional notes"><span>Other — see additional notes</span></label></div></details></div>
+<div class="form-field"><div id="label-unfamiliar" class="field-label">Response to new people or places <span aria-hidden="true">*</span></div><details class="multi-select"><summary>Select all that apply</summary><div class="checkbox-list" role="group" aria-labelledby="label-unfamiliar"><label class="check-option"><input type="checkbox" name="unfamiliar" value="Watches before joining"><span>Watches before joining</span></label><label class="check-option"><input type="checkbox" name="unfamiliar" value="Stays close to a familiar adult"><span>Stays close to a familiar adult</span></label><label class="check-option"><input type="checkbox" name="unfamiliar" value="Joins in quickly"><span>Joins in quickly</span></label><label class="check-option"><input type="checkbox" name="unfamiliar" value="May become upset or overwhelmed"><span>May become upset or overwhelmed</span></label><label class="check-option"><input type="checkbox" name="unfamiliar" value="Varies with the situation"><span>Varies with the situation</span></label><label class="check-option"><input type="checkbox" name="unfamiliar" value="Other — see additional notes"><span>Other — see additional notes</span></label></div></details></div>
+<div class="form-field"><div id="label-comfort" class="field-label">What usually helps them feel comfortable? <span aria-hidden="true">*</span></div><details class="multi-select"><summary>Select all that apply</summary><div class="checkbox-list" role="group" aria-labelledby="label-comfort"><label class="check-option"><input type="checkbox" name="comfort" value="A quiet space and time"><span>A quiet space and time</span></label><label class="check-option"><input type="checkbox" name="comfort" value="A familiar toy or blanket"><span>A familiar toy or blanket</span></label><label class="check-option"><input type="checkbox" name="comfort" value="Being held when welcomed"><span>Being held when welcomed</span></label><label class="check-option"><input type="checkbox" name="comfort" value="A song or story"><span>A song or story</span></label><label class="check-option"><input type="checkbox" name="comfort" value="A familiar adult nearby"><span>A familiar adult nearby</span></label><label class="check-option"><input type="checkbox" name="comfort" value="Other — see additional notes"><span>Other — see additional notes</span></label></div></details></div>
+<div class="form-field"><div id="label-communication" class="field-label">How do they usually communicate? <span aria-hidden="true">*</span></div><details class="multi-select"><summary>Select all that apply</summary><div class="checkbox-list" role="group" aria-labelledby="label-communication"><label class="check-option"><input type="checkbox" name="communication" value="Gestures and pointing"><span>Gestures and pointing</span></label><label class="check-option"><input type="checkbox" name="communication" value="Sounds and facial expressions"><span>Sounds and facial expressions</span></label><label class="check-option"><input type="checkbox" name="communication" value="Single words"><span>Single words</span></label><label class="check-option"><input type="checkbox" name="communication" value="Short phrases"><span>Short phrases</span></label><label class="check-option"><input type="checkbox" name="communication" value="A mix of words and gestures"><span>A mix of words and gestures</span></label><label class="check-option"><input type="checkbox" name="communication" value="Other — see additional notes"><span>Other — see additional notes</span></label></div></details></div>
+</section>
+<section class="form-section" aria-labelledby="sleep-heading">
+<h2 id="sleep-heading">Sleep and bedtime</h2>
+<div class="form-field"><label for="child-naps">Usual nap pattern *</label><select id="child-naps" name="naps" required><option value="">Choose a nap pattern</option><option>No naps</option><option>One nap</option><option>Two naps</option><option>Varies</option><option>Not sure yet</option></select></div>
+<div class="form-field"><div id="label-tiredSigns" class="field-label">Signs of tiredness <span aria-hidden="true">*</span></div><details class="multi-select"><summary>Select all that apply</summary><div class="checkbox-list" role="group" aria-labelledby="label-tiredSigns"><label class="check-option"><input type="checkbox" name="tiredSigns" value="Rubs eyes"><span>Rubs eyes</span></label><label class="check-option"><input type="checkbox" name="tiredSigns" value="Yawns"><span>Yawns</span></label><label class="check-option"><input type="checkbox" name="tiredSigns" value="Becomes quiet"><span>Becomes quiet</span></label><label class="check-option"><input type="checkbox" name="tiredSigns" value="Becomes fussy"><span>Becomes fussy</span></label><label class="check-option"><input type="checkbox" name="tiredSigns" value="Seeks closeness"><span>Seeks closeness</span></label><label class="check-option"><input type="checkbox" name="tiredSigns" value="Varies"><span>Varies</span></label><label class="check-option"><input type="checkbox" name="tiredSigns" value="Not sure yet"><span>Not sure yet</span></label><label class="check-option"><input type="checkbox" name="tiredSigns" value="Other — see additional notes"><span>Other — see additional notes</span></label></div></details></div>
+<div class="form-field"><div id="label-bedtimeRoutine" class="field-label">Bedtime routine <span aria-hidden="true">*</span></div><details class="multi-select"><summary>Select all that apply</summary><div class="checkbox-list" role="group" aria-labelledby="label-bedtimeRoutine"><label class="check-option"><input type="checkbox" name="bedtimeRoutine" value="Book"><span>Book</span></label><label class="check-option"><input type="checkbox" name="bedtimeRoutine" value="Song"><span>Song</span></label><label class="check-option"><input type="checkbox" name="bedtimeRoutine" value="Quiet time"><span>Quiet time</span></label><label class="check-option"><input type="checkbox" name="bedtimeRoutine" value="Varies"><span>Varies</span></label><label class="check-option"><input type="checkbox" name="bedtimeRoutine" value="Not sure yet"><span>Not sure yet</span></label><label class="check-option"><input type="checkbox" name="bedtimeRoutine" value="Other — see additional notes"><span>Other — see additional notes</span></label></div></details></div>
+<div class="form-field"><div id="label-settling" class="field-label">Response to settling down <span aria-hidden="true">*</span></div><details class="multi-select"><summary>Select all that apply</summary><div class="checkbox-list" role="group" aria-labelledby="label-settling"><label class="check-option"><input type="checkbox" name="settling" value="Settles easily"><span>Settles easily</span></label><label class="check-option"><input type="checkbox" name="settling" value="Needs reassurance"><span>Needs reassurance</span></label><label class="check-option"><input type="checkbox" name="settling" value="Resists stopping play"><span>Resists stopping play</span></label><label class="check-option"><input type="checkbox" name="settling" value="Varies"><span>Varies</span></label><label class="check-option"><input type="checkbox" name="settling" value="Not sure yet"><span>Not sure yet</span></label><label class="check-option"><input type="checkbox" name="settling" value="Other — see additional notes"><span>Other — see additional notes</span></label></div></details></div>
+</section>
+<section class="form-section" aria-labelledby="food-heading"><h2 id="food-heading">Food and allergies</h2>
+<div class="form-field"><div id="label-foods" class="field-label">Favorite type of food <span aria-hidden="true">*</span></div><details class="multi-select"><summary>Select all that apply</summary><div class="checkbox-list" role="group" aria-labelledby="label-foods"><label class="check-option"><input type="checkbox" name="foods" value="Fruit"><span>Fruit</span></label><label class="check-option"><input type="checkbox" name="foods" value="Vegetables"><span>Vegetables</span></label><label class="check-option"><input type="checkbox" name="foods" value="Rice, pasta, or bread"><span>Rice, pasta, or bread</span></label><label class="check-option"><input type="checkbox" name="foods" value="Yogurt or cheese"><span>Yogurt or cheese</span></label><label class="check-option"><input type="checkbox" name="foods" value="Eggs, beans, or meat"><span>Eggs, beans, or meat</span></label><label class="check-option"><input type="checkbox" name="foods" value="A variety of foods"><span>A variety of foods</span></label><label class="check-option"><input type="checkbox" name="foods" value="Other — see additional notes"><span>Other — see additional notes</span></label></div></details></div>
+<div class="form-field"><div id="label-allergies" class="field-label">Known food allergies <span aria-hidden="true">*</span></div><details class="multi-select"><summary>Select all that apply</summary><div class="checkbox-list" role="group" aria-labelledby="label-allergies"><label class="check-option"><input type="checkbox" name="allergies" value="None known"><span>None known</span></label><label class="check-option"><input type="checkbox" name="allergies" value="Milk"><span>Milk</span></label><label class="check-option"><input type="checkbox" name="allergies" value="Egg"><span>Egg</span></label><label class="check-option"><input type="checkbox" name="allergies" value="Peanut"><span>Peanut</span></label><label class="check-option"><input type="checkbox" name="allergies" value="Tree nuts"><span>Tree nuts</span></label><label class="check-option"><input type="checkbox" name="allergies" value="Wheat"><span>Wheat</span></label><label class="check-option"><input type="checkbox" name="allergies" value="Soy"><span>Soy</span></label><label class="check-option"><input type="checkbox" name="allergies" value="Sesame"><span>Sesame</span></label><label class="check-option"><input type="checkbox" name="allergies" value="Fish"><span>Fish</span></label><label class="check-option"><input type="checkbox" name="allergies" value="Shellfish"><span>Shellfish</span></label><label class="check-option"><input type="checkbox" name="allergies" value="Other — see additional notes"><span>Other — see additional notes</span></label><label class="check-option"><input type="checkbox" name="allergies" value="Unsure — confirm before offering food"><span>Unsure — confirm before offering food</span></label></div></details></div>
+<div class="form-field"><div id="label-foodAvoid" class="field-label">Food restrictions or instructions <span aria-hidden="true">*</span></div><details class="multi-select"><summary>Select all that apply</summary><div class="checkbox-list" role="group" aria-labelledby="label-foodAvoid"><label class="check-option"><input type="checkbox" name="foodAvoid" value="No additional restrictions"><span>No additional restrictions</span></label><label class="check-option"><input type="checkbox" name="foodAvoid" value="Vegetarian"><span>Vegetarian</span></label><label class="check-option"><input type="checkbox" name="foodAvoid" value="Vegan"><span>Vegan</span></label><label class="check-option"><input type="checkbox" name="foodAvoid" value="Avoid specific foods — see additional notes"><span>Avoid specific foods — see additional notes</span></label><label class="check-option"><input type="checkbox" name="foodAvoid" value="Follow a parent-provided meal plan"><span>Follow a parent-provided meal plan</span></label><label class="check-option"><input type="checkbox" name="foodAvoid" value="Other — see additional notes"><span>Other — see additional notes</span></label></div></details></div>
+</section>
+<section class="form-section" aria-labelledby="notes-heading">
+<h2 id="notes-heading">Additional notes</h2>
+<div class="form-field"><label for="child-notes">Anything else you’d like the caregiver to know? <span class="optional-label">Optional</span></label>
+<textarea id="child-notes" name="notes" maxlength="1500" placeholder="Other preferences, specific foods or allergies, or care instructions."></textarea></div>
+</section>
+      <div class="form-actions"><button class="feedback-button" type="submit">Save child profile</button><a href="#caregiver">Open caregiver view</a></div>
+      <p id="save-status" role="status"></p>
+    </form>
+
+    <section class="form-section invitation-panel" aria-labelledby="share-title">
+      <h2 id="share-title">Invite a caregiver</h2>
+      <p>Save the profile, then create an invitation. The invitation includes the saved answers and notes, including allergy information. Photos are excluded.</p>
+      <p class="form-help">Anyone with the code can read this information. Only share it with your intended caregiver. Create a new invitation after changing the profile.</p>
+      <button class="next-button" id="create-invitation" type="button">Create invitation</button>
+      <div id="invitation-output" hidden>
+        <div class="form-field"><label for="invitation-code">Invitation code</label><textarea id="invitation-code" readonly spellcheck="false"></textarea></div>
+        <div class="form-actions"><button class="remove-photo" id="copy-invitation" type="button">Copy code</button><button class="remove-photo" id="copy-invitation-link" type="button">Copy invitation link</button></div>
+      </div>
+      <p id="share-status" role="status"></p>
+    </section>
+  </main>
+
+  <main class="practice-layout" id="caregiver-screen">
+    <!-- Child information that supports the scenario -->
+    <aside class="profile-card" aria-labelledby="profile-title">
+      <span class="profile-avatar" aria-hidden="true">T</span>
+
+      <div class="profile-content">
+      <h2 id="profile-title">Meet Taeha <span class="child-age">21 months · Boy</span></h2>
+      <dl class="profile-details">
+        <dt>Temperament</dt>
+        <dd>Slow to warm up</dd>
+
+        <dt>Personality</dt>
+        <dd>Observant, cautious in new situations</dd>
+
+        <dt>Preferences</dt>
+        <dd>
+          Familiar routines and time to observe before participating
+        </dd>
+      </dl>
+      <details class="saved-details" hidden><summary>More about daily care</summary><dl id="care-details"></dl></details>
+      </div>
+    </aside>
+
+    <!-- Situation and response choices -->
+    <section class="scenario-card" aria-labelledby="scenario-title">
+      <div class="scenario-steps" aria-hidden="true"><span></span><span></span><span></span></div>
+      <h1 id="scenario-title">First Day Together</h1>
+      <p class="scenario-question">What would you do?</p>
+      <p class="scenario-description">
+        Taeha’s mom has just left. Taeha stands quietly near the door,
+        watching you. He isn’t crying, but he doesn’t approach you either.
+      </p>
+
+    </section>
+
+    <section class="response-section" aria-label="Choose a response and explore feedback">
+      <fieldset class="response-options">
+        <legend>How would you respond?</legend>
+
+        <p id="response-hint">Choose one response to consider.</p>
+
+        <label class="response-option">
+          <input
+            type="radio"
+            name="response"
+            value="approach-with-toy"
+            aria-describedby="response-hint"
+          >
+          <span>
+            <strong>A.</strong>
+            Approach Taeha with a toy and encourage him to play.
+          </span>
+        </label>
+
+        <label class="response-option">
+          <input
+            type="radio"
+            name="response"
+            value="stay-nearby"
+            aria-describedby="response-hint"
+          >
+          <span>
+            <strong>B.</strong>
+            Give Taeha some space, stay nearby, and let him approach
+            when he feels ready.
+          </span>
+        </label>
+
+        <label class="response-option">
+          <input
+            type="radio"
+            name="response"
+            value="pick-up"
+            aria-describedby="response-hint"
+          >
+          <span>
+            <strong>C.</strong>
+            Pick Taeha up and try to comfort him.
+          </span>
+        </label>
+      </fieldset>
+
+      <button
+        id="see-feedback"
+        class="feedback-button"
+        type="button"
+        aria-describedby="prototype-note"
+      >
+        See Feedback
+      </button>
+
+      <p class="prototype-note" id="prototype-note">
+        Choose a response, then see how it might fit Taeha’s needs.
+        You can try another response to compare.
+      </p>
+      <p class="selection-message" id="selection-message" role="status"></p>
+
+      <section class="feedback-panel" id="feedback-panel"
+        aria-labelledby="feedback-title" tabindex="-1" hidden>
+        <p class="eyebrow">Thinking about Taeha</p>
+        <h2 id="feedback-title"></h2>
+        <p id="feedback-explanation"></p>
+        <p class="prototype-note">
+          Follow Taeha’s cues; his needs may change in the moment.
+        </p>
+      </section>
+      <div class="scenario-navigation" id="scenario-navigation" hidden>
+        <button class="next-button" id="next-scenario" type="button">Next scenario →</button>
+      </div>
+      <noscript><p>Turn on JavaScript in your browser to explore feedback for each response.</p></noscript>
+    </section>
+    <section class="completion-card" id="empty-profile" hidden>
+      <h2>Start with your child’s profile</h2>
+      <p>Add a profile to explore caregiving scenarios, or use the Taeha sample to try the experience.</p>
+      <a href="#profile">Create child profile</a>
+    </section>
+    <section class="completion-card" id="completion-card" tabindex="-1" hidden aria-labelledby="completion-title">
+      <h2 id="completion-title">A little more prepared</h2>
+      <p>You’ve explored three everyday moments. In each one, noticing the child’s cues can help you decide what to try next.</p>
+      <label for="reflection">What is one thing you’ll keep in mind when caring for this child?</label>
+      <div class="form-field"><textarea id="reflection" placeholder="Take a moment to reflect…" maxlength="1000"></textarea></div>
+      <p class="form-help">Your reflection stays on this screen during this visit.</p>
+      <button class="next-button" id="restart-scenarios" type="button">Explore again</button>
+    </section>
+  </main>
+
+  <script>
+    // Each input value matches one feedback entry.
+    const feedback = {
+      "approach-with-toy": {
+        title: "Invite without rushing",
+        explanation: "A toy may spark Taeha’s interest, but he prefers time to observe. Sit nearby with it and let him choose when to join."
+      },
+      "stay-nearby": {
+        title: "Give him time to warm up",
+        explanation: "Staying nearby fits Taeha’s preference for observing first. Offer a gentle greeting and watch for signs that he wants more support."
+      },
+      "pick-up": {
+        title: "Offer comfort before lifting",
+        explanation: "Taeha’s quiet watching may mean he needs time rather than a hug. Offer your arms and see whether he reaches toward you before picking him up."
+      }
+    };
+
+
+    // Both views share one saved profile; no account or server is needed yet.
+    const defaultProfile = {
+      name: "Taeha", age: "21", gender: "Boy", pronouns: "he",
+      temperament: "Slow to warm up", personality: "Observant and cautious",
+      preferences: "Books and quiet play; Building and puzzles",
+      routines: "A warning before transitions; A book before bedtime",
+      unfamiliar: "Watches before joining; Stays close to a familiar adult",
+      comfort: "A quiet space and time; A familiar toy or blanket",
+      communication: "Gestures and pointing; Single words",
+      foods: "Fruit; Rice, pasta, or bread", allergies: "None known",
+      foodAvoid: "No additional restrictions", photo: "",
+      naps: "One nap", tiredSigns: "Rubs eyes; Becomes quiet",
+      bedtimeRoutine: "Book; Quiet time", settling: "Needs reassurance; Resists stopping play",
+      notes: "Fictional sample: Taeha likes looking at picture books before joining play. He points or says a single word to ask for help."
+    };
+    let childProfile = { ...defaultProfile };
+    try {
+      const stored = JSON.parse(localStorage.getItem("little-moments-profile"));
+      if (stored && typeof stored.name === "string" && !stored.name.trim()) {
+        childProfile = Object.fromEntries(Object.keys(defaultProfile).map(key => [key, ""]));
+      } else if (stored && typeof stored.name === "string" && stored.name.trim()) {
+        for (const key of Object.keys(defaultProfile)) {
+          if (typeof stored[key] === "string" && (stored[key].trim() || ["photo", "notes"].includes(key))) childProfile[key] = stored[key];
+        }
+      }
+    } catch (error) { /* The form still works if storage is unavailable. */ }
+
+    const profileForm = document.querySelector("#child-profile-form");
+    const multiKeys = ["personality", "preferences", "routines", "unfamiliar", "comfort", "communication", "foods", "allergies", "foodAvoid", "tiredSigns", "bedtimeRoutine", "settling"];
+    function populateProfileForm() {
+      profileForm.querySelectorAll('input[type="checkbox"]').forEach(input => { input.checked = false; input.setCustomValidity(""); });
+    for (const key of Object.keys(defaultProfile)) {
+      if (multiKeys.includes(key)) {
+        const group = document.querySelector('[name="' + key + '"]').closest(".checkbox-list");
+        const values = childProfile[key] ? childProfile[key].split("; ") : [];
+        for (const value of values) {
+          let input = Array.from(group.querySelectorAll("input")).find(input => input.value === value);
+          if (!input) {
+            const label = document.createElement("label"); label.className = "check-option";
+            input = document.createElement("input"); input.type = "checkbox"; input.name = key; input.value = value;
+            const text = document.createElement("span"); text.textContent = value + " (previously saved)";
+            label.append(input, text); group.append(label);
+          }
+          input.checked = true;
+        }
+      } else {
+        const field = profileForm.elements.namedItem(key);
+        if (field) field.value = childProfile[key];
+      }
+    }
+    }
+    populateProfileForm();
+    function updateChecklistSummaries() {
+      document.querySelectorAll(".multi-select").forEach(list => {
+        const count = list.querySelectorAll("input:checked").length;
+        list.querySelector("summary").textContent = count ? count + " selected — edit choices" : "Select all that apply";
+      });
+    }
+    updateChecklistSummaries();
+    profileForm.addEventListener("invalid", function (event) {
+      const list = event.target.closest(".multi-select");
+      if (list) list.open = true;
+    }, true);
+    profileForm.addEventListener("change", function (event) {
+      const input = event.target;
+      if (input.type === "checkbox") {
+        const exclusive = ["None known", "No additional restrictions", "Unsure — confirm before offering food"];
+        const group = input.closest(".checkbox-list");
+        if (input.checked) group.querySelectorAll("input").forEach(other => {
+          if (other !== input && (exclusive.includes(input.value) || exclusive.includes(other.value))) other.checked = false;
+        });
+        group.querySelector("input").setCustomValidity(group.querySelector("input:checked") ? "" : "Please select at least one answer.");
+        updateChecklistSummaries();
+      }
+    });
+    let draftPhoto = childProfile.photo;
+    let photoLoading = false;
+    function showPhotoPreview() {
+      const preview = document.querySelector("#photo-preview");
+      preview.hidden = !draftPhoto;
+      if (draftPhoto) preview.src = draftPhoto;
+      else preview.removeAttribute("src");
+      document.querySelector("#remove-photo").hidden = !draftPhoto;
+    }
+    function safePhoto(value) { return /^data:image\/(jpeg|png|webp);base64,/.test(value); }
+    if (!safePhoto(draftPhoto)) draftPhoto = "";
+    childProfile.photo = draftPhoto;
+    showPhotoPreview();
+    document.querySelector("#child-photo").addEventListener("change", async function () {
+      const file = this.files[0];
+      const status = document.querySelector("#photo-status");
+      if (!file) return;
+      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 1024 * 1024) {
+        status.textContent = "Please choose a JPG, PNG, or WebP image under 1 MB."; this.value = ""; return;
+      }
+      photoLoading = true;
+      status.textContent = "Loading photo…";
+      try {
+        const value = await new Promise((resolve, reject) => {
+          const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file);
+        });
+        const image = new Image(); image.src = value; await image.decode();
+        draftPhoto = value; showPhotoPreview();
+        status.textContent = "Photo ready. Save the profile to apply it.";
+      } catch (error) { status.textContent = "This image could not be opened. Please choose another photo."; }
+      finally { photoLoading = false; }
+    });
+    document.querySelector("#remove-photo").addEventListener("click", function () {
+      draftPhoto = ""; document.querySelector("#child-photo").value = ""; showPhotoPreview();
+      document.querySelector("#photo-status").textContent = "Photo removed. Save the profile to apply this change.";
+      document.querySelector("#save-status").textContent = "Unsaved changes.";
+    });
+
+    function updateCaregiver() {
+      const child = childProfile;
+      const empty = !child.name.trim();
+      document.querySelector("#empty-profile").hidden = !empty;
+      if (empty) {
+        document.querySelector("#profile-title").textContent = "Add a child profile";
+        document.querySelector(".profile-avatar").textContent = "+";
+        document.querySelectorAll(".profile-details dd").forEach(item => item.textContent = "Not added yet");
+        document.querySelector(".saved-details").hidden = true;
+        document.querySelector(".scenario-card").hidden = true;
+        document.querySelector(".response-section").hidden = true;
+        document.querySelector("#completion-card").hidden = true;
+        return;
+      }
+      const pronoun = ["he", "she", "they"].includes(child.pronouns) ? child.pronouns : "they";
+      const subject = pronoun[0].toUpperCase() + pronoun.slice(1);
+      const object = { he: "him", she: "her", they: "them" }[pronoun];
+      const possessive = { he: "his", she: "her", they: "their" }[pronoun];
+      const is = pronoun === "they" ? "are" : "is";
+      const does = pronoun === "they" ? "do" : "does";
+      const profileTitle = document.querySelector("#profile-title");
+      profileTitle.textContent = "Meet " + child.name + " ";
+      const ageLabel = document.createElement("span");
+      ageLabel.className = "child-age";
+      ageLabel.textContent = child.age + " months" + (child.gender ? " · " + child.gender : "");
+      profileTitle.append(ageLabel);
+      const avatar = document.querySelector(".profile-avatar");
+      avatar.textContent = child.name.slice(0, 1).toUpperCase();
+      if (safePhoto(child.photo || "")) {
+        const image = document.createElement("img"); image.src = child.photo; image.alt = "";
+        avatar.replaceChildren(image);
+      }
+      const descriptions = document.querySelectorAll(".profile-details dd");
+      [child.temperament, child.personality || "Not added yet", child.preferences || "Not added yet"].forEach((text, i) => descriptions[i].textContent = text);
+      document.querySelector(".scenario-description").textContent = child.name + "’s parent has just left. " + child.name + " stands quietly near the door, watching you. " + subject + " " + is + " not crying, but " + pronoun + " " + does + " not approach you either.";
+      const options = [
+        "Approach " + child.name + " with a toy and encourage " + object + " to play.",
+        "Give " + child.name + " some space, stay nearby, and let " + object + " approach when " + pronoun + (pronoun === "they" ? " feel" : " feels") + " ready.",
+        "Pick " + child.name + " up and try to comfort " + object + "."
+      ];
+      document.querySelectorAll(".response-option span").forEach((span, i) => {
+        const letter = document.createElement("strong"); letter.textContent = "ABC"[i] + ". ";
+        span.replaceChildren(letter, document.createTextNode(options[i]));
+      });
+      const details = document.querySelector("#care-details"); details.replaceChildren();
+      for (const [key, label] of [["routines", "Daily routines"], ["unfamiliar", "New situations"], ["comfort", "Comfort"], ["communication", "Communication"], ["foods", "Favorite foods"], ["allergies", "Food allergies"], ["foodAvoid", "Food restrictions and parent instructions"], ["naps", "Nap pattern"], ["tiredSigns", "Signs of tiredness"], ["bedtimeRoutine", "Bedtime routine"], ["settling", "Settling down"], ["notes", "Additional notes"]]) {
+        if (!child[key]) continue;
+        const term = document.createElement("dt"); term.textContent = label;
+        const description = document.createElement("dd"); description.textContent = child[key];
+        details.append(term, description);
+      }
+      document.querySelector(".saved-details").hidden = !details.children.length;
+      document.querySelector("#feedback-panel .eyebrow").textContent = "Thinking about " + child.name;
+      document.querySelector("#feedback-panel .prototype-note").textContent = "Follow " + child.name + "’s cues; needs may change in the moment.";
+      document.querySelector("#prototype-note").textContent = "Choose a response, then consider how it might fit " + child.name + "’s needs.";
+      const slow = child.temperament === "Slow to warm up";
+      feedback["approach-with-toy"] = { title: "Invite without rushing", explanation: slow ? "A toy may spark " + child.name + "’s interest, but this profile describes a child who needs time to warm up. Offer it nearby and let " + object + " decide when to join." : "A toy can offer a gentle invitation to connect with " + child.name + ". Watch for interest before encouraging more play." };
+      feedback["stay-nearby"] = { title: "Stay available", explanation: slow ? "Time to observe may suit " + child.name + "’s slow-to-warm-up temperament. Stay nearby and respond if " + pronoun + (pronoun === "they" ? " seek" : " seeks") + " support." : "Staying nearby leaves room for " + child.name + " to choose how to connect. Offer more support if " + pronoun + (pronoun === "they" ? " seem" : " seems") + " distressed." };
+      feedback["pick-up"] = { title: "Offer comfort before lifting", explanation: "Quiet watching alone does not show whether " + child.name + " wants to be held. Offer your arms and notice whether " + pronoun + (pronoun === "they" ? " reach" : " reaches") + " toward you." };
+      renderScenario();
+    }
+
+    profileForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      const nameInput = profileForm.elements.namedItem("name");
+      nameInput.setCustomValidity(nameInput.value.trim() ? "" : "Please enter a first name.");
+      // Require one or more answers per checklist, not every checkbox.
+      let firstMissing = null;
+      for (const key of multiKeys) {
+        const input = document.querySelector('[name="' + key + '"]');
+        const list = input.closest(".multi-select");
+        const missing = !list.querySelector("input:checked");
+        input.setCustomValidity(missing ? "Please select at least one answer." : "");
+        if (missing && !firstMissing) firstMissing = list;
+      }
+      if (firstMissing) {
+        firstMissing.open = true;
+        document.querySelector("#save-status").textContent = "Please answer every required question before saving.";
+      }
+      if (!profileForm.reportValidity()) return;
+      if (photoLoading) { document.querySelector("#save-status").textContent = "Please wait for the photo to finish loading."; return; }
+      childProfile = Object.fromEntries(Array.from(new FormData(profileForm), ([key, value]) => [key, value.trim()]));
+      const answers = new FormData(profileForm);
+      for (const key of multiKeys) childProfile[key] = answers.getAll(key).join("; ");
+      childProfile.photo = draftPhoto;
+      updateCaregiver();
+      document.querySelector("#invitation-output").hidden = true;
+      document.querySelector("#share-status").textContent = "";
+      const status = document.querySelector("#save-status");
+      try {
+        localStorage.setItem("little-moments-profile", JSON.stringify(childProfile));
+        status.textContent = "Profile saved. Open caregiver view when you’re ready.";
+      } catch (error) {
+        status.textContent = "Profile updated for this visit. This browser could not save it for next time.";
+      }
+    });
+    profileForm.elements.namedItem("name").addEventListener("input", function () { this.setCustomValidity(""); });
+    profileForm.addEventListener("input", function () { document.querySelector("#save-status").textContent = "Unsaved changes — save your profile before opening caregiver view."; });
+
+    let currentRole = "parent";
+    let parentProfile = null;
+    function showScreen() {
+      const route = location.hash;
+      if (route.startsWith("#invite=")) {
+        try { openInvitation(decodeURIComponent(route.slice(8))); }
+        catch (error) { document.querySelector("#invitation-status").textContent = "This invitation could not be opened. Ask the parent for a new code."; location.hash = "home"; }
+        return;
+      }
+      const home = !["#profile", "#caregiver"].includes(route);
+      const parentView = !home && route === "#profile" && currentRole === "parent";
+      if (route === "#profile" && currentRole === "caregiver") { location.hash = "caregiver"; return; }
+      document.querySelector("#welcome-screen").hidden = !home;
+      const homeLink = document.querySelector(".home-link");
+      if (home) homeLink.setAttribute("aria-current", "page");
+      else homeLink.removeAttribute("aria-current");
+      document.querySelector("#parent-screen").hidden = !parentView;
+      document.querySelector("#caregiver-screen").hidden = home || parentView;
+      document.querySelector(".header-nav").hidden = home;
+      document.querySelector('.header-nav a[href="#profile"]').hidden = currentRole === "caregiver";
+      document.title = "Little Moments | " + (home ? "Welcome" : parentView ? "Child profile" : "Caregiver view");
+      document.querySelectorAll(".header-nav a").forEach(link => {
+        if (link.hash === (parentView ? "#profile" : "#caregiver")) link.setAttribute("aria-current", "page");
+        else link.removeAttribute("aria-current");
+      });
+    }
+
+    function encodeInvitation(profile) {
+      const shared = { ...profile, photo: "" };
+      const bytes = new TextEncoder().encode(JSON.stringify({ version: 1, profile: shared }));
+      return "LM1." + btoa(Array.from(bytes, byte => String.fromCharCode(byte)).join(""));
+    }
+    function decodeInvitation(value) {
+      let code = value.trim();
+      if (code.includes("#invite=")) code = decodeURIComponent(code.split("#invite=")[1]);
+      if (!code.startsWith("LM1.") || code.length > 100000) throw new Error("Invalid invitation");
+      const bytes = Uint8Array.from(atob(code.slice(4)), char => char.charCodeAt(0));
+      const data = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+      if (data.version !== 1 || !data.profile || typeof data.profile.name !== "string" || !data.profile.name.trim()) throw new Error("Missing profile");
+      const clean = {};
+      for (const key of Object.keys(defaultProfile)) {
+        const value = data.profile[key];
+        if (typeof value !== "string" || value.length > 10000) throw new Error("Invalid profile field");
+        clean[key] = value;
+      }
+      if (!/^\d+$/.test(clean.age) || Number(clean.age) < 1 || Number(clean.age) > 72) throw new Error("Invalid age");
+      clean.photo = "";
+      return clean;
+    }
+    function openInvitation(code) {
+      const invitedProfile = decodeInvitation(code);
+      if (currentRole === "parent") parentProfile = { ...childProfile };
+      currentRole = "caregiver";
+      childProfile = invitedProfile;
+      scenarioIndex = 0; updateCaregiver();
+      // Remove the embedded profile from the visible address after opening it.
+      history.replaceState(null, "", "#caregiver");
+      showScreen();
+    }
+    document.querySelector("#parent-start").addEventListener("click", function () {
+      currentRole = "parent";
+      if (parentProfile) { childProfile = parentProfile; parentProfile = null; draftPhoto = childProfile.photo; populateProfileForm(); updateChecklistSummaries(); showPhotoPreview(); updateCaregiver(); }
+      location.hash = "profile";
+    });
+    document.querySelector("#invitation-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      try { openInvitation(document.querySelector("#invitation-input").value); document.querySelector("#invitation-status").textContent = ""; }
+      catch (error) { document.querySelector("#invitation-status").textContent = "That invitation could not be read. Paste the complete code or ask the parent for a new one."; }
+    });
+    document.querySelector("#create-invitation").addEventListener("click", function () {
+      const complete = childProfile.name.trim() && childProfile.age && childProfile.gender && childProfile.pronouns && childProfile.temperament && multiKeys.every(key => childProfile[key]);
+      if (!complete) { document.querySelector("#share-status").textContent = "Complete and save the required profile answers first."; return; }
+      document.querySelector("#invitation-code").value = encodeInvitation(childProfile);
+      document.querySelector("#invitation-output").hidden = false;
+      document.querySelector("#share-status").textContent = "Invitation ready from the last saved profile. Copy the code and send it to your caregiver.";
+    });
+    async function copyInvitation(asLink) {
+      const field = document.querySelector("#invitation-code");
+      const code = field.value.includes("#invite=") ? decodeURIComponent(field.value.split("#invite=")[1]) : field.value;
+      const value = asLink ? location.href.split("#")[0] + "#invite=" + encodeURIComponent(code) : code;
+      try {
+        await navigator.clipboard.writeText(value);
+        document.querySelector("#share-status").textContent = asLink && location.protocol === "file:" ? "Link copied. This local file link works only where the same app file is available. Share the code for a caregiver using their own copy of the app." : (asLink ? "Invitation link copied." : "Invitation code copied. Share it directly with your caregiver.");
+      } catch (error) {
+        field.value = value; field.focus(); field.select();
+        document.querySelector("#share-status").textContent = "Press Command+C to copy the selected invitation.";
+      }
+    }
+    document.querySelector("#copy-invitation").addEventListener("click", () => copyInvitation(false));
+    document.querySelector("#copy-invitation-link").addEventListener("click", () => copyInvitation(true));
+
+    let scenarioIndex = 0;
+    const scenarios = [
+      {
+        title: "First Day Together",
+        description: n => `${n}’s parent has just left. ${n} stands quietly near the door, watching you without approaching.`,
+        options: n => [`Approach ${n} with a toy and encourage play.`, `Give ${n} some space, stay nearby, and wait for signs of readiness.`, `Pick ${n} up and try to offer comfort.`],
+        feedback: (n, slow) => [
+          ["Invite without rushing", slow ? `A toy may interest ${n}, but time to observe fits this child’s slow-to-warm-up temperament. Offer it nearby and let ${n} decide when to join.` : `A toy may offer a gentle way to connect with ${n}. Watch for interest before encouraging more play.`],
+          ["Stay available", slow ? `Staying nearby gives ${n} time to warm up. Offer a gentle greeting and respond if more support seems welcome.` : `Staying nearby leaves room for ${n} to choose how to connect. Offer more support if distress appears.`],
+          ["Offer before lifting", `Quiet watching alone does not show whether ${n} wants to be held. Offer your arms and look for a welcoming response before lifting.`]
+        ]
+      },
+      {
+        title: "Something New at Lunch",
+        description: n => `At lunchtime, ${n} pushes an unfamiliar food away and turns toward a familiar snack. How might you respond?`,
+        options: n => [`Encourage ${n} to take one bite before offering anything else.`, `Offer a familiar food alongside the new one, without pressure.`, `Put the new food away and offer only the familiar snack.`],
+        feedback: (n, slow) => [
+          ["Leave room to explore", `Encouraging a bite may feel like pressure to ${n}. Offer a chance to look at or explore the food without requiring a taste.`],
+          ["Familiarity can be a bridge", slow ? `A familiar food may help ${n} feel comfortable while observing something new. Leave tasting optional and follow signs of interest.` : `A familiar food keeps something comfortable in the meal while ${n} explores. Let interest guide whether the new food gets tasted.`],
+          ["Comfort now, another chance later", `A familiar snack may make this moment easier for ${n}. You can offer the new food again another time without pressure.`]
+        ]
+      },
+      {
+        title: "Time to Put Toys Away",
+        description: n => `${n} is absorbed in play when it is time to start the bedtime routine. When you mention putting toys away, ${n} holds onto a favorite toy.`,
+        options: n => [`Put the toys away immediately and begin the bedtime routine.`, `Give a short warning and offer ${n} a small choice about cleaning up.`, `Let ${n} keep playing and try bedtime much later.`],
+        feedback: (n, slow) => [
+          ["Make the change easier to follow", `A sudden stop may make it harder for ${n} to shift attention. Name what comes next and allow a brief moment to finish.`],
+          ["A predictable next step", `A short warning and small choice can give ${n} a role in the transition. Use the familiar bedtime steps described by the parent when available.`],
+          ["Balance flexibility and routine", `A little extra time may help ${n} finish playing, but an open-ended delay can make the next step unclear. Agree on a small stopping point and keep the routine recognizable.`]
+        ]
+      }
+    ];
+
+    function renderScenario() {
+      const scenario = scenarios[scenarioIndex];
+      const name = childProfile.name;
+      document.querySelector("#completion-card").hidden = true;
+      document.querySelector(".scenario-card").hidden = false;
+      document.querySelector(".response-section").hidden = false;
+      document.querySelector("#scenario-title").textContent = scenario.title;
+      let description = scenario.description(name);
+      if (scenarioIndex === 1 && childProfile.foods) description += " The parent lists these familiar foods: " + childProfile.foods;
+      document.querySelector(".scenario-description").textContent = description;
+      let mealNote = document.querySelector("#meal-note");
+      if (!mealNote) {
+        mealNote = document.createElement("div"); mealNote.id = "meal-note"; mealNote.className = "care-note";
+        document.querySelector(".scenario-card").append(mealNote);
+      }
+      mealNote.hidden = scenarioIndex !== 1;
+      mealNote.replaceChildren();
+      for (const [label, value] of [
+        ["Parent-reported allergies", childProfile.allergies || "Not provided — confirm with the parent before offering food."],
+        ["Meal instructions", childProfile.foodAvoid]
+      ]) {
+        if (!value) continue;
+        const row = document.createElement("p");
+        const heading = document.createElement("strong");
+        heading.textContent = label + ": ";
+        row.append(heading, document.createTextNode(value));
+        mealNote.append(row);
+      }
+      const options = scenario.options(name);
+      const entries = scenario.feedback(name, childProfile.temperament === "Slow to warm up");
+      if (scenarioIndex === 1) {
+        entries.forEach(entry => entry[1] += " Follow the parent’s allergy and food instructions before offering anything.");
+      }
+      if (scenarioIndex === 2 && childProfile.routines) {
+        document.querySelector(".scenario-description").textContent += " The parent describes this routine: " + childProfile.routines;
+      }
+      const hasAnswer = (key, answer) => (childProfile[key] || "").split("; ").includes(answer);
+      if (scenarioIndex === 0) {
+        if (hasAnswer("preferences", "Books and quiet play")) {
+          options[0] = `Sit nearby with a picture book and invite ${name} to look when ready.`;
+          entries[0] = ["Start with something familiar", `The parent says ${name} enjoys books and quiet play. Reading nearby offers a familiar invitation without requiring immediate participation.`];
+        }
+        if (hasAnswer("unfamiliar", "Watches before joining")) {
+          entries[1] = ["Make room to observe", `The parent says ${name} watches before joining new situations. Staying available while giving time to observe fits that pattern.`];
+        }
+      }
+      if (scenarioIndex === 2 && hasAnswer("routines", "A book before bedtime")) {
+        options[1] = `Give a short warning, then let ${name} choose a book for bedtime.`;
+        entries[1] = ["Use a familiar next step", `The parent selected a warning before transitions and a book before bedtime. Offering a book choice can make the next step recognizable for ${name}.`];
+        if (!hasAnswer("routines", "A warning before transitions")) entries[1][1] = `The parent lists a book before bedtime as a familiar routine. A book choice may help ${name} see what comes after play.`;
+      }
+      if (scenarioIndex === 2) {
+        const cues = [];
+        if (hasAnswer("tiredSigns", "Rubs eyes")) cues.push("rubbing eyes");
+        if (hasAnswer("tiredSigns", "Yawns")) cues.push("yawning");
+        if (hasAnswer("tiredSigns", "Becomes quiet")) cues.push("growing quiet");
+        if (hasAnswer("tiredSigns", "Becomes fussy")) cues.push("becoming fussy");
+        if (hasAnswer("tiredSigns", "Seeks closeness")) cues.push("moving closer to you");
+        let sleepDescription = `${name} is playing as the familiar bedtime routine approaches.`;
+        if (cues.length) sleepDescription += ` You notice ${name} ${cues.join(" and ")}, signs the parent associates with tiredness.`;
+        sleepDescription += hasAnswer("settling", "Resists stopping play") ? ` When you mention putting toys away, ${name} holds onto a favorite toy.` : ` You need to help ${name} move from play toward settling down.`;
+        const napContext = { "No naps": "The parent reports no usual daytime nap.", "One nap": "The parent reports one usual daytime nap.", "Two naps": "The parent reports two usual daytime naps.", "Varies": "The parent reports that daytime naps vary." };
+        if (napContext[childProfile.naps]) sleepDescription += " " + napContext[childProfile.naps];
+        document.querySelector(".scenario-description").textContent = sleepDescription;
+        let step = "a familiar quiet activity";
+        if (hasAnswer("bedtimeRoutine", "Book")) step = "a bedtime book";
+        else if (hasAnswer("bedtimeRoutine", "Song")) step = "a familiar bedtime song";
+        else if (hasAnswer("bedtimeRoutine", "Quiet time")) step = "quiet time";
+        options[1] = `Give a short warning, then invite ${name} to choose ${step}.`;
+        entries[1] = ["Follow a familiar routine", `The parent lists ${step} as part of settling down. A short warning and familiar next step may help ${name} shift from play.`];
+        if (step === "a familiar quiet activity") entries[1][1] = `A short warning can make the transition clearer for ${name}. Check with the parent about which settling activity is familiar.`;
+        if (hasAnswer("settling", "Needs reassurance")) entries[0] = ["Make room for reassurance", `The parent says ${name} needs reassurance when settling. Explain the next step gently and stay available while ending play.`];
+      }
+      document.querySelectorAll(".response-option").forEach((label, index) => {
+        const input = label.querySelector("input");
+        input.checked = false;
+        const text = label.querySelector("span");
+        const letter = document.createElement("strong"); letter.textContent = "ABC"[index] + ". ";
+        text.replaceChildren(letter, document.createTextNode(options[index]));
+        feedback[input.value] = { title: entries[index][0], explanation: entries[index][1] };
+      });
+      document.querySelectorAll(".scenario-steps span").forEach((step, index) => step.classList.toggle("active", index <= scenarioIndex));
+      document.querySelector("#feedback-panel").hidden = true;
+      document.querySelector("#scenario-navigation").hidden = true;
+      document.querySelector("#selection-message").textContent = "";
+      document.querySelector("#next-scenario").textContent = scenarioIndex === scenarios.length - 1 ? "Finish and reflect →" : "Next scenario →";
+    }
+
+    document.querySelector("#next-scenario").addEventListener("click", function () {
+      if (scenarioIndex < scenarios.length - 1) {
+        scenarioIndex += 1;
+        renderScenario();
+        const title = document.querySelector("#scenario-title");
+        title.tabIndex = -1; title.focus();
+      } else {
+        document.querySelector(".scenario-card").hidden = true;
+        document.querySelector(".response-section").hidden = true;
+        const completion = document.querySelector("#completion-card");
+        completion.hidden = false; completion.focus();
+      }
+    });
+    document.querySelector("#restart-scenarios").addEventListener("click", function () {
+      scenarioIndex = 0;
+      renderScenario();
+      const title = document.querySelector("#scenario-title"); title.tabIndex = -1; title.focus();
+    });
+
+    document.querySelector("#clear-profile").addEventListener("click", function () {
+      document.querySelector("#invitation-output").hidden = true;
+      document.querySelector("#invitation-code").value = "";
+      document.querySelector("#share-status").textContent = "";
+      childProfile = Object.fromEntries(Object.keys(defaultProfile).map(key => [key, ""]));
+      draftPhoto = "";
+      document.querySelector("#child-photo").value = "";
+      document.querySelector("#photo-status").textContent = "";
+      profileForm.querySelectorAll("input, select, textarea").forEach(field => field.setCustomValidity(""));
+      populateProfileForm();
+      updateChecklistSummaries();
+      showPhotoPreview();
+      profileForm.querySelectorAll(".multi-select").forEach(list => list.open = false);
+      scenarioIndex = 0;
+      updateCaregiver();
+      // Replace empty-profile presentation with a clear invitation to start.
+      document.querySelector("#profile-title").textContent = "Add a child profile";
+      document.querySelector(".profile-avatar").textContent = "+";
+      document.querySelector(".scenario-card").hidden = true;
+      document.querySelector(".response-section").hidden = true;
+      document.querySelector("#completion-card").hidden = true;
+      document.querySelector("#empty-profile").hidden = false;
+      let message = "Profile cleared. Enter your child’s details or load the Taeha sample.";
+      try { localStorage.setItem("little-moments-profile", JSON.stringify(childProfile)); }
+      catch (error) { message += " This browser could not save the cleared state."; }
+      document.querySelector("#save-status").textContent = message;
+    });
+
+    document.querySelector("#load-sample").addEventListener("click", function () {
+      document.querySelector("#invitation-output").hidden = true;
+      document.querySelector("#share-status").textContent = "";
+      childProfile = { ...defaultProfile };
+      draftPhoto = "";
+      document.querySelector("#child-photo").value = "";
+      document.querySelector("#photo-status").textContent = "";
+      populateProfileForm(); updateChecklistSummaries(); showPhotoPreview();
+      scenarioIndex = 0; updateCaregiver();
+      try {
+        localStorage.setItem("little-moments-profile", JSON.stringify(childProfile));
+        document.querySelector("#save-status").textContent = "Taeha’s fictional sample is loaded and saved. Open Caregiver view to begin.";
+      } catch (error) {
+        document.querySelector("#save-status").textContent = "Taeha’s sample is loaded for this visit. Open Caregiver view to begin.";
+      }
+    });
+    updateCaregiver();
+    showScreen();
+    window.addEventListener("hashchange", showScreen);
+
+    const feedbackButton = document.querySelector("#see-feedback");
+    const feedbackPanel = document.querySelector("#feedback-panel");
+    const selectionMessage = document.querySelector("#selection-message");
+    const responseOptions = document.querySelector(".response-options");
+
+    feedbackButton.addEventListener("click", function () {
+      const selected = document.querySelector('input[name="response"]:checked');
+
+      // Give guidance if the visitor has not selected a response yet.
+      if (!selected) {
+        selectionMessage.textContent = "Please choose a response before viewing feedback.";
+        document.querySelector('input[name="response"]').focus();
+        return;
+      }
+
+      const entry = feedback[selected.value];
+      document.querySelector("#feedback-title").textContent = entry.title;
+      document.querySelector("#feedback-explanation").textContent = entry.explanation;
+      selectionMessage.textContent = "";
+      feedbackPanel.hidden = false;
+      document.querySelector("#scenario-navigation").hidden = false;
+      feedbackPanel.focus();
+    });
+
+    // Hide previous feedback when the visitor chooses another response.
+    responseOptions.addEventListener("change", function () {
+      feedbackPanel.hidden = true;
+      document.querySelector("#scenario-navigation").hidden = true;
+      selectionMessage.textContent = "";
+    });
+  </script>
+</body>
+</html>
