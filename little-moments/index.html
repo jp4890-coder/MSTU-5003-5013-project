@@ -316,7 +316,7 @@
       <section class="role-card"><h2>For parents</h2><p>Create or update a profile, preview the caregiver experience, and share an invitation.</p><button class="next-button" type="button" id="parent-start">Create a child profile</button></section>
       <section class="role-card"><h2>For caregivers</h2><p>Enter the invitation code or link a parent shared with you.</p><form id="invitation-form"><div class="form-field"><label for="invitation-input">Invitation code or link</label><textarea id="invitation-input" required spellcheck="false" placeholder="Paste your invitation here"></textarea></div><button class="next-button" type="submit">Open invitation</button><p id="invitation-status" role="status"></p></form></section>
     </div>
-    <p class="form-help">This prototype works in your browser. Invitations are shareable copies of profile information, not password-protected accounts.</p>
+    <p class="form-help">Portfolio demo: use fictional information. Invitations contain readable copies of profile information, including notes; they are not encrypted, password protected, revocable, or automatically updated. Invited profiles stay in memory only: after refreshing, paste the invitation again.</p>
   </main>
 
   <main class="parent-layout" id="parent-screen" hidden>
@@ -329,7 +329,7 @@
       <section class="form-section" aria-labelledby="basic-heading"><h2 id="basic-heading">Basic information</h2>
         <div class="form-grid">
           <div class="form-field"><label for="child-name">Child’s first name *</label><input id="child-name" name="name" required maxlength="40" autocomplete="off"></div>
-          <div class="form-field"><label for="child-age">Age in months *</label><input id="child-age" name="age" type="number" min="1" max="72" step="1" required aria-describedby="age-help"><p class="form-help" id="age-help">For children ages 1–72 months.</p></div>
+          <div class="form-field"><label for="child-age">Age in months *</label><input id="child-age" name="age" type="number" min="18" max="36" step="1" required aria-describedby="age-help"><p class="form-help" id="age-help">Provisional practice range: 18–36 months. These scenarios are not developmental assessments.</p></div>
           <div class="form-field"><label for="child-gender">Gender *</label><select id="child-gender" name="gender" required><option value="">Choose a gender</option><option>Boy</option><option>Girl</option><option>Another gender</option><option>Not sure yet</option><option>Prefer not to say</option></select></div>
           <div class="form-field"><label for="child-pronouns">Pronouns *</label><select id="child-pronouns" name="pronouns" required><option value="">Choose pronouns</option><option value="they">They / them</option><option value="he">He / him</option><option value="she">She / her</option></select></div>
         </div>
@@ -385,7 +385,7 @@
     </section>
   </main>
 
-  <main class="practice-layout" id="caregiver-screen">
+  <main class="practice-layout" id="caregiver-screen" hidden>
     <!-- Child information that supports the scenario -->
     <aside class="profile-card" aria-labelledby="profile-title">
       <span class="profile-avatar" aria-hidden="true">T</span>
@@ -498,7 +498,7 @@
     </section>
     <section class="completion-card" id="empty-profile" hidden>
       <h2>Start with your child’s profile</h2>
-      <p>Add a profile to explore caregiving scenarios, or use the Taeha sample to try the experience.</p>
+      <p>Complete and save a profile for ages 18–36 months to preview practice, or explicitly load the fictional Taeha sample.</p>
       <a href="#profile">Create child profile</a>
     </section>
     <section class="completion-card" id="completion-card" tabindex="-1" hidden aria-labelledby="completion-title">
@@ -512,25 +512,10 @@
   </main>
 
   <script>
-    // Each input value matches one feedback entry.
-    const feedback = {
-      "approach-with-toy": {
-        title: "Invite without rushing",
-        explanation: "A toy may spark Taeha’s interest, but he prefers time to observe. Sit nearby with it and let him choose when to join."
-      },
-      "stay-nearby": {
-        title: "Give him time to warm up",
-        explanation: "Staying nearby fits Taeha’s preference for observing first. Offer a gentle greeting and watch for signs that he wants more support."
-      },
-      "pick-up": {
-        title: "Offer comfort before lifting",
-        explanation: "Taeha’s quiet watching may mean he needs time rather than a hug. Offer your arms and see whether he reaches toward you before picking him up."
-      }
-    };
+    // Feedback is filled from the current scenario, never from sample defaults.
+    const feedback = {};
 
-
-    // Both views share one saved profile; no account or server is needed yet.
-    const defaultProfile = {
+    const sampleProfile = {
       name: "Taeha", age: "21", gender: "Boy", pronouns: "he",
       temperament: "Slow to warm up", personality: "Observant and cautious",
       preferences: "Books and quiet play; Building and puzzles",
@@ -544,23 +529,51 @@
       bedtimeRoutine: "Book; Quiet time", settling: "Needs reassurance; Resists stopping play",
       notes: "Fictional sample: Taeha likes looking at picture books before joining play. He points or says a single word to ask for help."
     };
-    let childProfile = { ...defaultProfile };
-    try {
-      const stored = JSON.parse(localStorage.getItem("little-moments-profile"));
-      if (stored && typeof stored.name === "string" && !stored.name.trim()) {
-        childProfile = Object.fromEntries(Object.keys(defaultProfile).map(key => [key, ""]));
-      } else if (stored && typeof stored.name === "string" && stored.name.trim()) {
-        for (const key of Object.keys(defaultProfile)) {
-          if (typeof stored[key] === "string" && (stored[key].trim() || ["photo", "notes"].includes(key))) childProfile[key] = stored[key];
-        }
-      }
-    } catch (error) { /* The form still works if storage is unavailable. */ }
-
+    // Empty fields mean unknown. Sample answers are loaded only by explicit choice.
+    const emptyProfile = () => Object.fromEntries(Object.keys(sampleProfile).map(key => [key, ""]));
     const profileForm = document.querySelector("#child-profile-form");
     const multiKeys = ["personality", "preferences", "routines", "unfamiliar", "comfort", "communication", "foods", "allergies", "foodAvoid", "tiredSigns", "bedtimeRoutine", "settling"];
+    const exclusiveAnswers = ["None known", "No additional restrictions", "Unsure — confirm before offering food"];
+
+    // One validator for saved profiles and invitations. Unknown choices never become rules.
+    function validateProfile(profile, requireComplete = false) {
+      if (!profile || typeof profile !== "object" || Array.isArray(profile)) throw new Error("Invalid profile");
+      const clean = emptyProfile();
+      for (const key of Object.keys(clean)) {
+        const value = profile[key] === undefined ? "" : profile[key];
+        if (typeof value !== "string") throw new Error("Invalid field");
+        const limit = key === "photo" ? 1500000 : key === "notes" ? 1500 : key === "name" ? 40 : 2000;
+        if (value.length > limit) throw new Error("Field too long");
+        clean[key] = value.trim();
+        if (key === "photo" && value && !safePhoto(value)) throw new Error("Invalid photo");
+        if (multiKeys.includes(key) && value) {
+          const answers = value.split("; ");
+          const allowed = Array.from(profileForm.querySelectorAll('[name="' + key + '"]')).map(input => input.value);
+          if (answers.some(answer => !allowed.includes(answer)) || new Set(answers).size !== answers.length) throw new Error("Unsupported answer");
+          if (answers.length > 1 && answers.some(answer => exclusiveAnswers.includes(answer))) throw new Error("Conflicting answers");
+        }
+        const field = profileForm.elements.namedItem(key);
+        if (field && field.tagName === "SELECT" && value && !Array.from(field.options).some(option => option.value === value)) throw new Error("Unsupported choice");
+      }
+      if (clean.age && (!/^\d+$/.test(clean.age) || Number(clean.age) < 18 || Number(clean.age) > 36)) throw new Error("Age outside practice range");
+      const required = ["name", "age", "gender", "pronouns", "temperament", "naps", ...multiKeys];
+      if (requireComplete && required.some(key => !clean[key])) throw new Error("Incomplete profile");
+      return clean;
+    }
+    function completeProfile(profile) {
+      try { validateProfile(profile, true); return true; } catch { return false; }
+    }
+    let childProfile = emptyProfile();
+    let storageWarning = "";
+    try {
+      const stored = JSON.parse(localStorage.getItem("little-moments-profile"));
+      if (stored) childProfile = validateProfile(stored);
+    } catch {
+      storageWarning = "The saved profile could not be safely loaded. It has not been changed. Review or enter a profile for ages 18–36 months.";
+    }
     function populateProfileForm() {
       profileForm.querySelectorAll('input[type="checkbox"]').forEach(input => { input.checked = false; input.setCustomValidity(""); });
-    for (const key of Object.keys(defaultProfile)) {
+    for (const key of Object.keys(sampleProfile)) {
       if (multiKeys.includes(key)) {
         const group = document.querySelector('[name="' + key + '"]').closest(".checkbox-list");
         const values = childProfile[key] ? childProfile[key].split("; ") : [];
@@ -644,10 +657,10 @@
 
     function updateCaregiver() {
       const child = childProfile;
-      const empty = !child.name.trim();
+      const empty = !completeProfile(child);
       document.querySelector("#empty-profile").hidden = !empty;
       if (empty) {
-        document.querySelector("#profile-title").textContent = "Add a child profile";
+        document.querySelector("#profile-title").textContent = "Complete a child profile";
         document.querySelector(".profile-avatar").textContent = "+";
         document.querySelectorAll(".profile-details dd").forEach(item => item.textContent = "Not added yet");
         document.querySelector(".saved-details").hidden = true;
@@ -656,12 +669,6 @@
         document.querySelector("#completion-card").hidden = true;
         return;
       }
-      const pronoun = ["he", "she", "they"].includes(child.pronouns) ? child.pronouns : "they";
-      const subject = pronoun[0].toUpperCase() + pronoun.slice(1);
-      const object = { he: "him", she: "her", they: "them" }[pronoun];
-      const possessive = { he: "his", she: "her", they: "their" }[pronoun];
-      const is = pronoun === "they" ? "are" : "is";
-      const does = pronoun === "they" ? "do" : "does";
       const profileTitle = document.querySelector("#profile-title");
       profileTitle.textContent = "Meet " + child.name + " ";
       const ageLabel = document.createElement("span");
@@ -676,16 +683,6 @@
       }
       const descriptions = document.querySelectorAll(".profile-details dd");
       [child.temperament, child.personality || "Not added yet", child.preferences || "Not added yet"].forEach((text, i) => descriptions[i].textContent = text);
-      document.querySelector(".scenario-description").textContent = child.name + "’s parent has just left. " + child.name + " stands quietly near the door, watching you. " + subject + " " + is + " not crying, but " + pronoun + " " + does + " not approach you either.";
-      const options = [
-        "Approach " + child.name + " with a toy and encourage " + object + " to play.",
-        "Give " + child.name + " some space, stay nearby, and let " + object + " approach when " + pronoun + (pronoun === "they" ? " feel" : " feels") + " ready.",
-        "Pick " + child.name + " up and try to comfort " + object + "."
-      ];
-      document.querySelectorAll(".response-option span").forEach((span, i) => {
-        const letter = document.createElement("strong"); letter.textContent = "ABC"[i] + ". ";
-        span.replaceChildren(letter, document.createTextNode(options[i]));
-      });
       const details = document.querySelector("#care-details"); details.replaceChildren();
       for (const [key, label] of [["routines", "Daily routines"], ["unfamiliar", "New situations"], ["comfort", "Comfort"], ["communication", "Communication"], ["foods", "Favorite foods"], ["allergies", "Food allergies"], ["foodAvoid", "Food restrictions and parent instructions"], ["naps", "Nap pattern"], ["tiredSigns", "Signs of tiredness"], ["bedtimeRoutine", "Bedtime routine"], ["settling", "Settling down"], ["notes", "Additional notes"]]) {
         if (!child[key]) continue;
@@ -697,10 +694,6 @@
       document.querySelector("#feedback-panel .eyebrow").textContent = "Thinking about " + child.name;
       document.querySelector("#feedback-panel .prototype-note").textContent = "Follow " + child.name + "’s cues; needs may change in the moment.";
       document.querySelector("#prototype-note").textContent = "Choose a response, then consider how it might fit " + child.name + "’s needs.";
-      const slow = child.temperament === "Slow to warm up";
-      feedback["approach-with-toy"] = { title: "Invite without rushing", explanation: slow ? "A toy may spark " + child.name + "’s interest, but this profile describes a child who needs time to warm up. Offer it nearby and let " + object + " decide when to join." : "A toy can offer a gentle invitation to connect with " + child.name + ". Watch for interest before encouraging more play." };
-      feedback["stay-nearby"] = { title: "Stay available", explanation: slow ? "Time to observe may suit " + child.name + "’s slow-to-warm-up temperament. Stay nearby and respond if " + pronoun + (pronoun === "they" ? " seek" : " seeks") + " support." : "Staying nearby leaves room for " + child.name + " to choose how to connect. Offer more support if " + pronoun + (pronoun === "they" ? " seem" : " seems") + " distressed." };
-      feedback["pick-up"] = { title: "Offer comfort before lifting", explanation: "Quiet watching alone does not show whether " + child.name + " wants to be held. Offer your arms and notice whether " + pronoun + (pronoun === "they" ? " reach" : " reaches") + " toward you." };
       renderScenario();
     }
 
@@ -727,6 +720,7 @@
       const answers = new FormData(profileForm);
       for (const key of multiKeys) childProfile[key] = answers.getAll(key).join("; ");
       childProfile.photo = draftPhoto;
+      childProfile = validateProfile(childProfile, true);
       updateCaregiver();
       document.querySelector("#invitation-output").hidden = true;
       document.querySelector("#share-status").textContent = "";
@@ -742,12 +736,20 @@
     profileForm.addEventListener("input", function () { document.querySelector("#save-status").textContent = "Unsaved changes — save your profile before opening caregiver view."; });
 
     let currentRole = "parent";
+    // No child information is added to session storage. Refresh requires explicit re-entry.
+    let caregiverSession = false;
     let parentProfile = null;
     function showScreen() {
       const route = location.hash;
       if (route.startsWith("#invite=")) {
         try { openInvitation(decodeURIComponent(route.slice(8))); }
         catch (error) { document.querySelector("#invitation-status").textContent = "This invitation could not be opened. Ask the parent for a new code."; location.hash = "home"; }
+        return;
+      }
+      if (route === "#caregiver" && !caregiverSession) {
+        document.querySelector("#invitation-status").textContent = "This practice session is not active. Paste your invitation again, or open Child profile and explicitly preview your saved profile. No invited child information is retained after refresh.";
+        history.replaceState(null, "", "#home");
+        showScreen();
         return;
       }
       const home = !["#profile", "#caregiver"].includes(route);
@@ -768,6 +770,20 @@
       });
     }
 
+    document.querySelectorAll('a[href="#caregiver"]').forEach(link => {
+      link.addEventListener("click", event => {
+        if (currentRole === "parent") {
+          if (!completeProfile(childProfile)) {
+            event.preventDefault();
+            document.querySelector("#save-status").textContent = "Complete and save a profile for ages 18–36 months before previewing.";
+            location.hash = "profile";
+            return;
+          }
+          caregiverSession = true;
+        }
+      });
+    });
+
     function encodeInvitation(profile) {
       const shared = { ...profile, photo: "" };
       const bytes = new TextEncoder().encode(JSON.stringify({ version: 1, profile: shared }));
@@ -779,14 +795,8 @@
       if (!code.startsWith("LM1.") || code.length > 100000) throw new Error("Invalid invitation");
       const bytes = Uint8Array.from(atob(code.slice(4)), char => char.charCodeAt(0));
       const data = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
-      if (data.version !== 1 || !data.profile || typeof data.profile.name !== "string" || !data.profile.name.trim()) throw new Error("Missing profile");
-      const clean = {};
-      for (const key of Object.keys(defaultProfile)) {
-        const value = data.profile[key];
-        if (typeof value !== "string" || value.length > 10000) throw new Error("Invalid profile field");
-        clean[key] = value;
-      }
-      if (!/^\d+$/.test(clean.age) || Number(clean.age) < 1 || Number(clean.age) > 72) throw new Error("Invalid age");
+      if (data.version !== 1) throw new Error("Unsupported invitation version");
+      const clean = validateProfile(data.profile, true);
       clean.photo = "";
       return clean;
     }
@@ -794,6 +804,7 @@
       const invitedProfile = decodeInvitation(code);
       if (currentRole === "parent") parentProfile = { ...childProfile };
       currentRole = "caregiver";
+      caregiverSession = true;
       childProfile = invitedProfile;
       scenarioIndex = 0; updateCaregiver();
       // Remove the embedded profile from the visible address after opening it.
@@ -802,16 +813,18 @@
     }
     document.querySelector("#parent-start").addEventListener("click", function () {
       currentRole = "parent";
+      caregiverSession = false;
+      document.querySelector("#invitation-input").value = "";
       if (parentProfile) { childProfile = parentProfile; parentProfile = null; draftPhoto = childProfile.photo; populateProfileForm(); updateChecklistSummaries(); showPhotoPreview(); updateCaregiver(); }
       location.hash = "profile";
     });
     document.querySelector("#invitation-form").addEventListener("submit", function (event) {
       event.preventDefault();
       try { openInvitation(document.querySelector("#invitation-input").value); document.querySelector("#invitation-status").textContent = ""; }
-      catch (error) { document.querySelector("#invitation-status").textContent = "That invitation could not be read. Paste the complete code or ask the parent for a new one."; }
+      catch (error) { document.querySelector("#invitation-status").textContent = "That invitation is invalid, incomplete, or outside the 18–36 month practice range. Ask the parent to review and save the profile and send a new code."; }
     });
     document.querySelector("#create-invitation").addEventListener("click", function () {
-      const complete = childProfile.name.trim() && childProfile.age && childProfile.gender && childProfile.pronouns && childProfile.temperament && multiKeys.every(key => childProfile[key]);
+      const complete = completeProfile(childProfile);
       if (!complete) { document.querySelector("#share-status").textContent = "Complete and save the required profile answers first."; return; }
       document.querySelector("#invitation-code").value = encodeInvitation(childProfile);
       document.querySelector("#invitation-output").hidden = false;
@@ -899,9 +912,6 @@
       if (scenarioIndex === 1) {
         entries.forEach(entry => entry[1] += " Follow the parent’s allergy and food instructions before offering anything.");
       }
-      if (scenarioIndex === 2 && childProfile.routines) {
-        document.querySelector(".scenario-description").textContent += " The parent describes this routine: " + childProfile.routines;
-      }
       const hasAnswer = (key, answer) => (childProfile[key] || "").split("; ").includes(answer);
       if (scenarioIndex === 0) {
         if (hasAnswer("preferences", "Books and quiet play")) {
@@ -911,11 +921,6 @@
         if (hasAnswer("unfamiliar", "Watches before joining")) {
           entries[1] = ["Make room to observe", `The parent says ${name} watches before joining new situations. Staying available while giving time to observe fits that pattern.`];
         }
-      }
-      if (scenarioIndex === 2 && hasAnswer("routines", "A book before bedtime")) {
-        options[1] = `Give a short warning, then let ${name} choose a book for bedtime.`;
-        entries[1] = ["Use a familiar next step", `The parent selected a warning before transitions and a book before bedtime. Offering a book choice can make the next step recognizable for ${name}.`];
-        if (!hasAnswer("routines", "A warning before transitions")) entries[1][1] = `The parent lists a book before bedtime as a familiar routine. A book choice may help ${name} see what comes after play.`;
       }
       if (scenarioIndex === 2) {
         const cues = [];
@@ -930,14 +935,15 @@
         const napContext = { "No naps": "The parent reports no usual daytime nap.", "One nap": "The parent reports one usual daytime nap.", "Two naps": "The parent reports two usual daytime naps.", "Varies": "The parent reports that daytime naps vary." };
         if (napContext[childProfile.naps]) sleepDescription += " " + napContext[childProfile.naps];
         document.querySelector(".scenario-description").textContent = sleepDescription;
+        // Choose once: a reported book, then song, then quiet time. Both routine fields count.
         let step = "a familiar quiet activity";
-        if (hasAnswer("bedtimeRoutine", "Book")) step = "a bedtime book";
+        if (hasAnswer("bedtimeRoutine", "Book") || hasAnswer("routines", "A book before bedtime")) step = "a bedtime book";
         else if (hasAnswer("bedtimeRoutine", "Song")) step = "a familiar bedtime song";
         else if (hasAnswer("bedtimeRoutine", "Quiet time")) step = "quiet time";
-        options[1] = `Give a short warning, then invite ${name} to choose ${step}.`;
-        entries[1] = ["Follow a familiar routine", `The parent lists ${step} as part of settling down. A short warning and familiar next step may help ${name} shift from play.`];
+        options[1] = `Give a short warning, then offer ${step} and a small choice about starting it.`;
+        entries[1] = ["Follow a familiar routine", `Offering a short warning and ${step} connects the transition to a routine the parent reported. A small choice may help ${name} take part; watch how the child responds.`];
         if (step === "a familiar quiet activity") entries[1][1] = `A short warning can make the transition clearer for ${name}. Check with the parent about which settling activity is familiar.`;
-        if (hasAnswer("settling", "Needs reassurance")) entries[0] = ["Make room for reassurance", `The parent says ${name} needs reassurance when settling. Explain the next step gently and stay available while ending play.`];
+        if (hasAnswer("settling", "Needs reassurance")) entries[0] = ["Make room for reassurance", `Putting toys away immediately may feel abrupt, especially because the parent says ${name} needs reassurance. Before ending play, explain what comes next, allow a brief finishing moment, and stay available.`];
       }
       document.querySelectorAll(".response-option").forEach((label, index) => {
         const input = label.querySelector("input");
@@ -973,11 +979,17 @@
       const title = document.querySelector("#scenario-title"); title.tabIndex = -1; title.focus();
     });
 
+    function confirmReplacement(action) {
+      const hasInformation = storageWarning || childProfile.name || Array.from(new FormData(profileForm).values()).some(value => typeof value === "string" && value.trim()) || draftPhoto;
+      return !hasInformation || window.confirm(action + " This replaces the saved profile and any unsaved edits in this browser. Existing shared invitations are not changed or revoked. Continue?");
+    }
     document.querySelector("#clear-profile").addEventListener("click", function () {
+      if (!confirmReplacement("Clear this profile?")) return;
+      caregiverSession = false;
       document.querySelector("#invitation-output").hidden = true;
       document.querySelector("#invitation-code").value = "";
       document.querySelector("#share-status").textContent = "";
-      childProfile = Object.fromEntries(Object.keys(defaultProfile).map(key => [key, ""]));
+      childProfile = Object.fromEntries(Object.keys(sampleProfile).map(key => [key, ""]));
       draftPhoto = "";
       document.querySelector("#child-photo").value = "";
       document.querySelector("#photo-status").textContent = "";
@@ -989,7 +1001,7 @@
       scenarioIndex = 0;
       updateCaregiver();
       // Replace empty-profile presentation with a clear invitation to start.
-      document.querySelector("#profile-title").textContent = "Add a child profile";
+      document.querySelector("#profile-title").textContent = "Complete a child profile";
       document.querySelector(".profile-avatar").textContent = "+";
       document.querySelector(".scenario-card").hidden = true;
       document.querySelector(".response-section").hidden = true;
@@ -1002,9 +1014,11 @@
     });
 
     document.querySelector("#load-sample").addEventListener("click", function () {
+      if (!confirmReplacement("Load the fictional Taeha demonstration?")) return;
+      caregiverSession = false;
       document.querySelector("#invitation-output").hidden = true;
       document.querySelector("#share-status").textContent = "";
-      childProfile = { ...defaultProfile };
+      childProfile = { ...sampleProfile };
       draftPhoto = "";
       document.querySelector("#child-photo").value = "";
       document.querySelector("#photo-status").textContent = "";
@@ -1017,6 +1031,7 @@
         document.querySelector("#save-status").textContent = "Taeha’s sample is loaded for this visit. Open Caregiver view to begin.";
       }
     });
+    document.querySelector("#save-status").textContent = storageWarning;
     updateCaregiver();
     showScreen();
     window.addEventListener("hashchange", showScreen);
