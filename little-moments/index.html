@@ -290,7 +290,6 @@
     .home-link:hover, .home-link[aria-current="page"] { background: var(--sage-light); }
     .home-link:focus-visible { outline: 3px solid #8da48e; outline-offset: 3px; }
   </style>
-  <link rel="stylesheet" href="homepage-preview.css">
 </head>
 
 <body>
@@ -308,37 +307,16 @@
 
 
 
-  <main class="editorial-home" id="welcome-screen" hidden>
-    <section class="home-hero" aria-labelledby="home-title">
-      <p class="home-eyebrow">A little understanding goes a long way</p>
-      <h1 id="home-title">Care begins with the little things.</h1>
-      <p class="hero-intro">Share what makes your child unique. Make everyday care feel more familiar.</p>
-    </section>
-    <section class="home-paths" id="begin" aria-labelledby="begin-title">
-      <div class="paths-heading"><h2 id="begin-title">Where would you like to begin?</h2></div>
-      <div class="path-grid">
-        <section class="path" aria-labelledby="parent-path-title">
-          <span class="path-label">For parents</span>
-          <h3 id="parent-path-title">Share their little world.</h3>
-          <p>Share their comforts, interests, and routines.</p>
-          <button class="next-button" type="button" id="parent-start">Create a child profile <span aria-hidden="true">→</span></button>
-        </section>
-        <section class="path path-caregiver" aria-labelledby="caregiver-path-title">
-          <span class="path-label">For caregivers</span>
-          <h3 id="caregiver-path-title">Get to know them, gently.</h3>
-          <p>Explore three everyday moments with a parent’s invitation.</p>
-          <form id="invitation-form">
-            <div class="form-field"><label for="invitation-input">Invitation code or link</label><textarea id="invitation-input" rows="2" required spellcheck="false" placeholder="Paste the invitation shared with you"></textarea></div>
-            <button class="next-button" type="submit">Open invitation <span aria-hidden="true">→</span></button>
-            <p id="invitation-status" role="status"></p>
-          </form>
-        </section>
-      </div>
-    </section>
-    <footer class="home-footer">
-      <p>Little Moments. More thoughtful care.</p>
-      <details><summary>About this portfolio demo</summary><p>Use fictional information. Invitations contain readable copies of profile information, including notes; they are not encrypted, password protected, revocable, or automatically updated. Invited profiles stay in memory only: after refreshing, paste the invitation again.</p></details>
-    </footer>
+  <main class="parent-layout" id="welcome-screen" hidden>
+    <p class="eyebrow">A little understanding goes a long way</p>
+    <h1>Small moments. More thoughtful care.</h1>
+    <p class="intro">Every child has their own way of exploring, communicating, and finding comfort. Little Moments helps parents share those details and caregivers practice using them.</p>
+    <ol class="how-it-works"><li><strong>Share what matters.</strong> A parent creates a child profile.</li><li><strong>Invite a caregiver.</strong> Share a code containing the saved profile.</li><li><strong>Explore everyday moments.</strong> The caregiver tries three scenarios and reads feedback connected to the child.</li></ol>
+    <div class="role-grid">
+      <section class="role-card"><h2>For parents</h2><p>Create or update a profile, preview the caregiver experience, and share an invitation.</p><button class="next-button" type="button" id="parent-start">Create a child profile</button></section>
+      <section class="role-card"><h2>For caregivers</h2><p>Enter the invitation code or link a parent shared with you.</p><form id="invitation-form"><div class="form-field"><label for="invitation-input">Invitation code or link</label><textarea id="invitation-input" required spellcheck="false" placeholder="Paste your invitation here"></textarea></div><button class="next-button" type="submit">Open invitation</button><p id="invitation-status" role="status"></p></form></section>
+    </div>
+    <p class="form-help">This prototype works in your browser. Invitations are shareable copies of profile information, not password-protected accounts.</p>
   </main>
 
   <main class="parent-layout" id="parent-screen" hidden>
@@ -775,7 +753,6 @@
         return;
       }
       const home = !["#profile", "#caregiver"].includes(route);
-      document.body.classList.toggle("home-preview", home);
       const parentView = !home && route === "#profile" && currentRole === "parent";
       if (route === "#profile" && currentRole === "caregiver") { location.hash = "caregiver"; return; }
       document.querySelector("#welcome-screen").hidden = !home;
