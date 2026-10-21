@@ -26,6 +26,10 @@ From the repository root, start `python3 -m http.server --bind 127.0.0.1 8000`. 
 
 Before real use, instructional review must confirm that the three situations, response wording, and small-choice expectations fit the 18–36 month range and differing communication abilities. Age validation alone does not make the content developmentally validated.
 
+## Warm editorial homepage preview
+
+The `design/little-moments-warm-editorial` branch starts from completed Stage 1 and changes only the homepage aesthetic. `homepage-preview.css` scopes the editorial typography, ivory/sage palette, responsive grid, and path cards to the home screen. Parent profile and all scenario screens retain Stage 1 styling and behavior pending design approval. The original Stage 1 regression suite applies unchanged. No external fonts, imagery, or services are required.
+
 ## AI assistance
 
 ChatGPT/Codex assisted with layout planning, HTML/CSS, JavaScript interactions, and debugging. The student supplied the concept and paper sketch and directed iterative design revisions.
