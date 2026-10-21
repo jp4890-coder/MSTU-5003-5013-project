@@ -272,7 +272,19 @@
 
     .care-note { text-align: left; }
     #first-day-notice { background: var(--sage-light); }
-    #first-day-notice h2 { margin-bottom: 14px; }
+    #first-day-notice h2 { margin-bottom: 10px; font-size: 19px; }
+    #first-day-review { padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--sage-light); }
+    #first-day-review summary { cursor: pointer; }
+    #first-day-review button { margin: 6px 6px 0 0; }
+    #first-day-review summary:focus-visible { outline: 3px solid #8da48e; outline-offset: 3px; }
+    #revision-status:empty { display: none; }
+    #caregiver-screen.first-day-flow { gap: 16px; margin-top: 22px; }
+    .first-day-flow .scenario-card { padding: 20px; }
+    .first-day-flow .feedback-panel { margin-top: 12px; padding: 18px; }
+    .first-day-flow .care-note { margin-top: 0; }
+    .first-day-flow .scenario-description { padding: 16px; font-size: 16px; }
+    .first-day-flow .response-option { padding: 13px; margin-bottom: 10px; }
+    .first-day-flow #prototype-note { margin-bottom: 0; }
     .care-note p { margin: 0; }
     .care-note p + p { margin-top: 12px; }
 
@@ -414,6 +426,7 @@
     <section class="scenario-card" aria-labelledby="scenario-title">
       <div class="scenario-steps" aria-hidden="true"><span></span><span></span><span></span></div>
       <h1 id="scenario-title">First Day Together</h1>
+      <p id="learning-progress" class="eyebrow" tabindex="-1" hidden></p>
       <p class="scenario-question">What would you do?</p>
       <p class="scenario-description">
         Taeha’s mom has just left. Taeha stands quietly near the door,
@@ -423,13 +436,23 @@
     </section>
 
     <section id="first-day-notice" class="care-note" aria-labelledby="notice-title" hidden>
-      <p class="eyebrow">Notice → Choose → Observe → Adjust → Reflect</p>
-      <h2 id="notice-title">Notice before interpreting</h2>
-      <p><strong>Parent shared:</strong> <span id="first-day-facts"></span></p>
+
+      <h2 id="notice-title">Parent shared</h2>
+      <p id="first-day-facts"></p>
       <p id="first-day-observation"></p>
-      <p><strong>Using the parent’s report:</strong> <span id="first-day-context"></span></p>
+      <details><summary>Activity and comfort options</summary><p id="first-day-context"></p></details>
     </section>
     <section class="response-section" aria-label="Choose a response and explore feedback">
+      <details id="first-day-review" hidden>
+        <summary>Review completed steps or revise a choice</summary>
+        <p id="completed-initial"></p>
+        <p id="completed-reaction"></p>
+        <p id="completed-adjustment"></p>
+        <p class="form-help">Revising the first response clears the reaction, adjustment, and reflection. Revising the adjustment clears its takeaway and reflection.</p>
+        <button id="revise-initial" class="remove-photo" type="button">Revise first response</button>
+        <button id="revise-adjustment" class="remove-photo" type="button">Revise adjustment</button>
+      </details>
+      <p id="revision-status" role="status"></p>
       <fieldset class="response-options">
         <legend>How would you respond?</legend>
 
@@ -503,6 +526,7 @@
       <section id="first-day-adjust" class="feedback-panel" hidden aria-labelledby="adjust-title" tabindex="-1">
         <h2 id="adjust-title">Adjust to what you noticed</h2>
         <p id="reaction-meaning"></p>
+        <p class="form-help"><strong>Parent shared:</strong> <span id="adjust-parent-details"></span></p>
         <fieldset id="adjust-options" class="response-options"><legend>What would you try next?</legend></fieldset>
         <button id="choose-adjustment" class="feedback-button" type="button">Reflect on my adjustment</button>
         <p id="adjust-message" role="status"></p>
@@ -510,9 +534,9 @@
       <section id="first-day-takeaway" class="feedback-panel" hidden aria-labelledby="takeaway-title" tabindex="-1">
         <p class="eyebrow">Reflect · First Day Together</p>
         <h2 id="takeaway-title">Your practice takeaway</h2>
-        <p id="adjustment-feedback"></p>
+        <details><summary>Why this cue leaves room for doubt</summary><p id="adjustment-feedback"></p></details>
         <dl id="takeaway-details"></dl>
-        <p><strong>General caregiving guidance:</strong> Keep offers responsive. Eye contact, speech, touch, and immediate participation are not required.</p>
+        <p class="form-help">General guidance: offers can be declined. Speech, eye contact, touch, and joining in are not required.</p>
         <label for="first-day-reflection">What would you check before trying this in real life? <span class="optional-label">Optional</span></label>
         <div class="form-field"><textarea id="first-day-reflection" maxlength="500" placeholder="A cue to watch or a question for the parent…"></textarea></div>
         <p class="form-help">Practice choices and this reflection stay in memory for this visit only.</p>
@@ -885,15 +909,38 @@
       document.querySelector("#takeaway-details").replaceChildren();
     }
 
+    // Three visible screens keep earlier work available in a collapsed review.
+    function setFirstDayStep(step, moveFocus = true) {
+      document.querySelector("#learning-progress").textContent = "Moment 1 of 3 · " + ({ choose: "Notice & choose", adjust: "Observe & adjust", reflect: "Reflect" })[step];
+      document.querySelector("#first-day-notice").hidden = step !== "choose";
+      document.querySelector(".scenario-description").hidden = step !== "choose";
+      document.querySelector(".scenario-question").hidden = step !== "choose";
+      for (const selector of [".response-section > .response-options", "#see-feedback", "#prototype-note"]) document.querySelector(selector).hidden = step !== "choose";
+      document.querySelector("#feedback-panel").hidden = step !== "adjust";
+      document.querySelector("#first-day-adjust").hidden = step !== "adjust";
+      document.querySelector("#first-day-takeaway").hidden = step !== "reflect";
+      document.querySelector("#scenario-navigation").hidden = step !== "reflect";
+      const review = document.querySelector("#first-day-review");
+      review.hidden = step === "choose"; review.open = false;
+      document.querySelector("#revise-adjustment").hidden = step !== "reflect";
+      if (moveFocus) {
+        const title = document.querySelector("#learning-progress");
+        title.focus({ preventScroll: true });
+        document.querySelector(".scenario-card").scrollIntoView({ block: "start", behavior: "instant" });
+      }
+    }
+
     function observeFirstDay(selected) {
       resetFirstDay();
       initialChoice = Array.from(document.querySelectorAll('input[name="response"]')).indexOf(selected);
       const reaction = firstDay.reactions[initialChoice];
-      document.querySelector("#feedback-title").textContent = "Observe · One possible reaction";
+      document.querySelector("#feedback-title").textContent = "One possible reaction";
       document.querySelector("#feedback-explanation").textContent = reaction.cue;
       document.querySelector("#feedback-panel .eyebrow").textContent = "Fictional practice · not a prediction";
-      document.querySelector("#feedback-panel .prototype-note").textContent = "This illustrates a possibility, not how this child will reliably respond. There is no score for cooperation.";
-      document.querySelector("#reaction-meaning").textContent = reaction.meaning;
+      document.querySelector("#feedback-panel .prototype-note").textContent = "A real child may respond differently.";
+      // Observation prompt only; interpretation is withheld until after the decision.
+      document.querySelector("#reaction-meaning").textContent = reaction.prompt;
+      document.querySelector("#adjust-parent-details").textContent = firstDay.decisionFacts(initialChoice);
       const fieldset = document.querySelector("#adjust-options");
       reaction.adjustments.forEach((choice, index) => {
         const label = document.createElement("label"); label.className = "response-option";
@@ -901,11 +948,12 @@
         const text = document.createElement("span"); text.textContent = choice.text;
         label.append(input, text); fieldset.append(label);
       });
-      document.querySelector("#feedback-panel").hidden = false;
-      document.querySelector("#first-day-adjust").hidden = false;
-      document.querySelector("#scenario-navigation").hidden = true;
+      document.querySelector("#completed-initial").textContent = "First response: " + firstDay.choices[initialChoice];
+      document.querySelector("#completed-reaction").textContent = "Fictional reaction: " + reaction.cue;
+      document.querySelector("#completed-adjustment").textContent = "";
       document.querySelector("#selection-message").textContent = "";
-      document.querySelector("#feedback-panel").focus();
+      document.querySelector("#revision-status").textContent = "";
+      setFirstDayStep("adjust");
     }
 
     document.querySelector("#choose-adjustment").addEventListener("click", () => {
@@ -915,28 +963,42 @@
         document.querySelector("#adjust-message").textContent = "Choose what you would try next before reflecting.";
         document.querySelector('input[name="adjustment"]').focus(); return;
       }
+      const adjusted = Number(selected.value);
+      const takeaway = firstDay.takeaway(initialChoice, adjusted);
       const reaction = firstDay.reactions[initialChoice];
-      const adjustment = reaction.adjustments[Number(selected.value)];
       document.querySelector("#adjust-message").textContent = "";
-      document.querySelector("#adjustment-feedback").textContent = adjustment.feedback;
+      document.querySelector("#adjustment-feedback").textContent = reaction.meaning;
       const details = document.querySelector("#takeaway-details"); details.replaceChildren();
       for (const [title, text] of [
-        ["Parent-reported context", firstDay.parentLink + " " + firstDay.context],
-        ["Cues you considered in practice", firstDay.cue + " Then: " + reaction.cue],
-        ["Your initial response", firstDay.choices[initialChoice]],
-        ["Your adjustment", adjustment.text],
-        ["Beyond this practice", firstDay.nextQuestion]
+        ["What mattered", takeaway.fact],
+        ["What you practiced", takeaway.insight],
+        ["What to notice next", takeaway.next]
       ]) {
         const term = document.createElement("dt"); term.textContent = title;
         const description = document.createElement("dd"); description.textContent = text;
         details.append(term, description);
       }
-      document.querySelector("#first-day-takeaway").hidden = false;
-      document.querySelector("#scenario-navigation").hidden = false;
-      document.querySelector("#first-day-takeaway").focus();
+      document.querySelector("#completed-adjustment").textContent = "Adjustment: " + reaction.adjustments[adjusted].text;
+      document.querySelector("#revision-status").textContent = "";
+      setFirstDayStep("reflect");
+    });
+    document.querySelector("#revise-initial").addEventListener("click", () => {
+      initialChoice = null;
+      resetFirstDay();
+      document.querySelector("#selection-message").textContent = "";
+      document.querySelector("#revision-status").textContent = "Later decisions and reflection cleared. Review your first response, then observe again.";
+      setFirstDayStep("choose");
+    });
+    document.querySelector("#revise-adjustment").addEventListener("click", () => {
+      document.querySelectorAll('input[name="adjustment"]').forEach(input => input.checked = false);
+      document.querySelector("#first-day-reflection").value = "";
+      document.querySelector("#takeaway-details").replaceChildren();
+      document.querySelector("#completed-adjustment").textContent = "";
+      document.querySelector("#revision-status").textContent = "Takeaway and reflection cleared. The first response and fictional reaction are unchanged.";
+      setFirstDayStep("adjust");
     });
     document.querySelector("#adjust-options").addEventListener("change", () => {
-      document.querySelector("#first-day-takeaway").hidden = true;
+      document.querySelector("#adjust-message").textContent = "";
       document.querySelector("#scenario-navigation").hidden = true;
       document.querySelector("#first-day-reflection").value = "";
     });
@@ -1008,9 +1070,9 @@
         document.querySelector(".scenario-description").textContent = firstDay.cue;
         document.querySelector("#first-day-facts").textContent = firstDay.facts;
         document.querySelector("#first-day-observation").textContent = firstDay.observation;
-        document.querySelector("#first-day-context").textContent = firstDay.context;
+        document.querySelector("#first-day-context").textContent = firstDay.details;
         options.splice(0, options.length, ...firstDay.choices);
-        document.querySelector("#prototype-note").textContent = "Choose a response, observe a fictional possibility, then make a second decision. These are not predictions about your child.";
+        document.querySelector("#prototype-note").textContent = "You can revise later. A new first response resets the adjustment and reflection.";
       }
       if (scenarioIndex === 2) {
         const cues = [];
@@ -1051,6 +1113,19 @@
       document.querySelector("#scenario-navigation").hidden = true;
       document.querySelector("#selection-message").textContent = "";
       document.querySelector("#next-scenario").textContent = scenarioIndex === scenarios.length - 1 ? "Finish and reflect →" : "Next scenario →";
+      document.querySelector("#first-day-review").hidden = true;
+      document.querySelector("#first-day-notice details").open = false;
+      document.querySelector("#revision-status").textContent = "";
+      document.querySelector("#caregiver-screen").classList.toggle("first-day-flow", Boolean(firstDay));
+      document.querySelector(".profile-card").hidden = Boolean(firstDay);
+      document.querySelector("#learning-progress").hidden = !firstDay;
+      document.querySelector(".scenario-description").hidden = false;
+      document.querySelector(".scenario-question").hidden = false;
+      for (const selector of [".response-section > .response-options", "#see-feedback", "#prototype-note"]) document.querySelector(selector).hidden = false;
+      if (firstDay) {
+        document.querySelector("#next-scenario").textContent = "Continue to Mealtime →";
+        setFirstDayStep("choose", false);
+      }
     }
 
     document.querySelector("#next-scenario").addEventListener("click", function () {

@@ -62,6 +62,10 @@ const invitation = profile => 'LM1.' + Buffer.from(JSON.stringify({ version: 1, 
       await page.locator('#invitation-form button').click();
       for (let scenario = 0; scenario < 3; scenario++) {
         for (let option = 0; option < 3; option++) {
+          if (scenario === 0 && !(await page.locator('#see-feedback').isVisible())) {
+            await page.locator('#first-day-review summary').click();
+            await page.locator('#revise-initial').click();
+          }
           await page.locator('input[name="response"]').nth(option).check();
           await page.locator('#see-feedback').click();
           assert.ok((await page.locator('#feedback-explanation').innerText()).length > 30);
@@ -90,6 +94,10 @@ const invitation = profile => 'LM1.' + Buffer.from(JSON.stringify({ version: 1, 
       await page.locator('#invitation-form button').click();
       for (let scenario = 0; scenario < 3; scenario++) {
         for (let option = 0; option < 3; option++) {
+          if (scenario === 0 && !(await page.locator('#see-feedback').isVisible())) {
+            await page.locator('#first-day-review summary').click();
+            await page.locator('#revise-initial').click();
+          }
           await page.locator('input[name="response"]').nth(option).check();
           await page.locator('#see-feedback').click();
           if (scenario === 0 && option === 0) assert.doesNotMatch(await page.locator('#feedback-explanation').innerText(), /slow-to-warm|enjoys books/);

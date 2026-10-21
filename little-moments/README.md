@@ -26,15 +26,19 @@ From the repository root, start `python3 -m http.server --bind 127.0.0.1 8000`. 
 
 Before real use, instructional review must confirm that the three situations, response wording, and small-choice expectations fit the 18–36 month range and differing communication abilities. Age validation alone does not make the content developmentally validated.
 
-## First Day Together: two-decision practice
+## First Day Together: focused two-decision practice
 
-First Day Together now follows Notice → Choose → Observe → Adjust → Reflect. The caregiver chooses an initial response, reads one explicitly fictional possible reaction, and makes a second decision before continuing. A takeaway connects the parent report, both choices, observed practice cues, and a real-life observation or parent question. Reflection is optional; choices and reflection remain in memory only and are cleared when the scenario resets. There are no cooperation scores or predicted outcomes.
+The moment uses three screens: Notice & Choose, Observe & Adjust, and Reflect. Only the current step is expanded. A native disclosure retains earlier choices and the fictional reaction for review. “Revise first response” explicitly clears later work; “Revise adjustment” preserves the first response and reaction but clears the takeaway and optional reflection. Keyboard focus moves to the current step heading. Progress reads “Moment 1 of 3,” and the final button names Mealtime.
 
-`first-day.js` contains the authored content in plain JavaScript. Three settings cover watching before joining, joining quickly, and uncertain/variable reports. Contradictory watch/join reports use the uncertain setting. Each setting has three initial choices, each with one authored reaction and three adjustments. Communication changes the cue and invitation format; favorite activities and comfort preferences supply supported offers. Selection uses a documented order in the source to choose one demonstration, not a judgment that one strategy is better. Unknown or “other” answers trigger neutral invitations and parent clarification; notes are not interpreted automatically. No new profile fields, storage, or external services were added.
+`first-day.js` contains three small authored settings: watching before joining, joining quickly, and uncertain/variable reports. Every initial response has one fictional new cue and three different adjustment actions. Before adjusting, only an observational question is shown; interpretation appears afterward in optional feedback. Takeaways contain exactly three parts: What mattered, What you practiced, and What to notice next. Their parent detail and next question follow the selected path, so touch or comfort is not presented as relevant when it was not used.
 
-Mealtime and Bedtime retain their Stage 1 content and single-decision interactions.
+Communication changes cues and concrete check-in wording. With one recognized activity, the setting can use it. With multiple activities, the setting stays general and lists all reports in the expandable context; it does not choose a favorite. Multiple recognized comfort strategies remain explicit alternatives, without ranking. Unknown/“other” reports prompt parent clarification rather than invented preferences. Mixed communication uses one explicitly fictional cue, not a claim that this mode is preferred. Notes are never interpreted automatically.
 
-Run the additional checks with `node little-moments/tests/first-day.cjs`. They exercise all 27 initial/adjustment combinations across three fictional profiles, authored fallbacks, choice gating, takeaways, reset behavior, viewport widths, and refresh re-entry. The Stage 1 suite retains its existing assertions and now completes the required First Day adjustment before moving on.
+Mealtime and Bedtime retain their Stage 1 content and interactions. No new profile fields, persistent learning records, accounts, scoring, generated reactions, or external services were added. Choices and optional reflections stay in memory and are reset by revision or leaving the scenario.
+
+Run `node little-moments/tests/stage1.cjs` and `node little-moments/tests/first-day.cjs` against the local server. Set `LITTLE_MOMENTS_URL` for another port and `CHROMIUM_PATH` if needed. The First Day checks cover all 27 decision combinations across three contrasting fictional profiles, every supported language variant, unknown/conflicting reports, multi-selection behavior, disclosure, keyboard revisions, focus, reset warnings, responsive layouts, and refresh re-entry. Set `LM_REVIEW_DIR` to a directory outside the checkout to capture nine 390px screenshots during that test run.
+
+These authored paths illustrate possible responses, not predictions or evidence of learning effectiveness. Caregiver usability sessions and an early-childhood instructional review remain necessary before real-world use.
 
 ## AI assistance
 
