@@ -511,6 +511,7 @@
     </section>
   </main>
 
+  <script src="simple-first-day.js"></script>
   <script>
     // Feedback is filled from the current scenario, never from sample defaults.
     const feedback = {};
@@ -847,16 +848,7 @@
 
     let scenarioIndex = 0;
     const scenarios = [
-      {
-        title: "First Day Together",
-        description: n => `${n}’s parent has just left. ${n} stands quietly near the door, watching you without approaching.`,
-        options: n => [`Approach ${n} with a toy and encourage play.`, `Give ${n} some space, stay nearby, and wait for signs of readiness.`, `Pick ${n} up and try to offer comfort.`],
-        feedback: (n, slow) => [
-          ["Invite without rushing", slow ? `A toy may interest ${n}, but time to observe fits this child’s slow-to-warm-up temperament. Offer it nearby and let ${n} decide when to join.` : `A toy may offer a gentle way to connect with ${n}. Watch for interest before encouraging more play.`],
-          ["Stay available", slow ? `Staying nearby gives ${n} time to warm up. Offer a gentle greeting and respond if more support seems welcome.` : `Staying nearby leaves room for ${n} to choose how to connect. Offer more support if distress appears.`],
-          ["Offer before lifting", `Quiet watching alone does not show whether ${n} wants to be held. Offer your arms and look for a welcoming response before lifting.`]
-        ]
-      },
+      { title: "First Day Together" }, // One-decision content is in simple-first-day.js.
       {
         title: "Something New at Lunch",
         description: n => `At lunchtime, ${n} pushes an unfamiliar food away and turns toward a familiar snack. How might you respond?`,
@@ -886,7 +878,8 @@
       document.querySelector(".scenario-card").hidden = false;
       document.querySelector(".response-section").hidden = false;
       document.querySelector("#scenario-title").textContent = scenario.title;
-      let description = scenario.description(name);
+      const moment = scenarioIndex === 0 ? simpleFirstDay(childProfile) : null;
+      let description = moment ? moment.description : scenario.description(name);
       if (scenarioIndex === 1 && childProfile.foods) description += " The parent lists these familiar foods: " + childProfile.foods;
       document.querySelector(".scenario-description").textContent = description;
       let mealNote = document.querySelector("#meal-note");
@@ -907,21 +900,12 @@
         row.append(heading, document.createTextNode(value));
         mealNote.append(row);
       }
-      const options = scenario.options(name);
-      const entries = scenario.feedback(name, childProfile.temperament === "Slow to warm up");
+      const options = moment ? moment.options : scenario.options(name);
+      const entries = moment ? moment.entries : scenario.feedback(name, childProfile.temperament === "Slow to warm up");
       if (scenarioIndex === 1) {
         entries.forEach(entry => entry[1] += " Follow the parent’s allergy and food instructions before offering anything.");
       }
       const hasAnswer = (key, answer) => (childProfile[key] || "").split("; ").includes(answer);
-      if (scenarioIndex === 0) {
-        if (hasAnswer("preferences", "Books and quiet play")) {
-          options[0] = `Sit nearby with a picture book and invite ${name} to look when ready.`;
-          entries[0] = ["Start with something familiar", `The parent says ${name} enjoys books and quiet play. Reading nearby offers a familiar invitation without requiring immediate participation.`];
-        }
-        if (hasAnswer("unfamiliar", "Watches before joining")) {
-          entries[1] = ["Make room to observe", `The parent says ${name} watches before joining new situations. Staying available while giving time to observe fits that pattern.`];
-        }
-      }
       if (scenarioIndex === 2) {
         const cues = [];
         if (hasAnswer("tiredSigns", "Rubs eyes")) cues.push("rubbing eyes");
