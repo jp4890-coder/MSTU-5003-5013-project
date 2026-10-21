@@ -71,6 +71,11 @@ const invitation = profile => 'LM1.' + Buffer.from(JSON.stringify({ version: 1, 
             assert.match(await page.locator('#feedback-explanation').innerText(), /routine the parent reported/);
           }
         }
+        // First Day now requires a second decision; retain all original safety checks.
+        if (scenario === 0) {
+          await page.locator('input[name="adjustment"]').first().check();
+          await page.locator('#choose-adjustment').click();
+        }
         await page.locator('#next-scenario').click();
       }
       await page.locator('#completion-card').waitFor({ state: 'visible' });
@@ -93,6 +98,11 @@ const invitation = profile => 'LM1.' + Buffer.from(JSON.stringify({ version: 1, 
             assert.doesNotMatch(explanation, /bedtime book/);
             assert.match(explanation, bedtimeRoutine === 'Song' ? /bedtime song/ : bedtimeRoutine === 'Quiet time' ? /quiet time/ : /Check with the parent/);
           }
+        }
+        // First Day now requires a second decision; retain all original safety checks.
+        if (scenario === 0) {
+          await page.locator('input[name="adjustment"]').first().check();
+          await page.locator('#choose-adjustment').click();
         }
         await page.locator('#next-scenario').click();
       }

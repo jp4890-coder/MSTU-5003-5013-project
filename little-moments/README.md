@@ -26,6 +26,16 @@ From the repository root, start `python3 -m http.server --bind 127.0.0.1 8000`. 
 
 Before real use, instructional review must confirm that the three situations, response wording, and small-choice expectations fit the 18–36 month range and differing communication abilities. Age validation alone does not make the content developmentally validated.
 
+## First Day Together: two-decision practice
+
+First Day Together now follows Notice → Choose → Observe → Adjust → Reflect. The caregiver chooses an initial response, reads one explicitly fictional possible reaction, and makes a second decision before continuing. A takeaway connects the parent report, both choices, observed practice cues, and a real-life observation or parent question. Reflection is optional; choices and reflection remain in memory only and are cleared when the scenario resets. There are no cooperation scores or predicted outcomes.
+
+`first-day.js` contains the authored content in plain JavaScript. Three settings cover watching before joining, joining quickly, and uncertain/variable reports. Contradictory watch/join reports use the uncertain setting. Each setting has three initial choices, each with one authored reaction and three adjustments. Communication changes the cue and invitation format; favorite activities and comfort preferences supply supported offers. Selection uses a documented order in the source to choose one demonstration, not a judgment that one strategy is better. Unknown or “other” answers trigger neutral invitations and parent clarification; notes are not interpreted automatically. No new profile fields, storage, or external services were added.
+
+Mealtime and Bedtime retain their Stage 1 content and single-decision interactions.
+
+Run the additional checks with `node little-moments/tests/first-day.cjs`. They exercise all 27 initial/adjustment combinations across three fictional profiles, authored fallbacks, choice gating, takeaways, reset behavior, viewport widths, and refresh re-entry. The Stage 1 suite retains its existing assertions and now completes the required First Day adjustment before moving on.
+
 ## AI assistance
 
 ChatGPT/Codex assisted with layout planning, HTML/CSS, JavaScript interactions, and debugging. The student supplied the concept and paper sketch and directed iterative design revisions.
