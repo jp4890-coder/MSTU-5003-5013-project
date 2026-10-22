@@ -1,4 +1,4 @@
-// Run with a local server on port 8000: node little-moments/tests/stage1.cjs
+// Run with a local server on port 8000: node little-moments/tests/regression.cjs
 // Requires Playwright and Chromium; no real child information is used.
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright');
