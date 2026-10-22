@@ -14,7 +14,6 @@ Keep `index.html` and `images/` together when downloading. To serve locally inst
 | --- | --- |
 | `index.html` | The complete app: semantic HTML, internal CSS, and JavaScript. |
 | `images/` | Three matching AI-generated fictional scenario illustrations. |
-| `SUBMISSION.docx` | Google Docs-ready project write-up, with design explanations, current screenshots, and a place for the student's paper sketch. |
 | `tests/regression.cjs` | Checks for current profile, invitation, scenario, and image behavior. |
 | `README.md` | Opening instructions and notes for the current version. |
 
@@ -36,4 +35,4 @@ From the repository root, start `python3 -m http.server --bind 127.0.0.1 8000`. 
 
 ## AI assistance
 
-ChatGPT/Codex helped with layout, code, debugging, and fictional illustrations. The student provided the idea and paper sketch, tested alternatives, rejected unnecessary complexity, restored the preferred homepage, and directed revisions to scenario choices. See `SUBMISSION.docx` for the design process and reflection.
+ChatGPT/Codex helped with layout, code, debugging, and fictional illustrations. The student provided the idea and paper sketch, tested alternatives, rejected unnecessary complexity, restored the preferred homepage, and directed revisions to scenario choices.
