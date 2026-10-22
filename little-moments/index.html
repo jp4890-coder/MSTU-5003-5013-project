@@ -907,8 +907,18 @@
       document.querySelector(".scenario-card").hidden = false;
       document.querySelector(".response-section").hidden = false;
       document.querySelector("#scenario-title").textContent = scenario.title;
-      document.querySelector(".scenario-scene").classList.toggle("has-illustration", scenarioIndex === 2);
-      document.querySelector(".scenario-illustration").hidden = scenarioIndex !== 2;
+      // Each moment has its own fictional scene; the interaction stays the same.
+      const illustrations = [
+        ["first-day-moment.png", "A fictional child near a doorway, observing a caregiver seated a short distance away."],
+        ["mealtime-moment.png", "A fictional child turning away from a plate while a caregiver sits nearby."],
+        ["bedtime-moment.png", "A fictional child holding a block and rubbing an eye, with a caregiver nearby."]
+      ];
+      const [file, imageDescription] = illustrations[scenarioIndex];
+      const illustration = document.querySelector(".scenario-illustration img");
+      illustration.src = "images/" + file;
+      illustration.alt = imageDescription;
+      document.querySelector(".scenario-scene").classList.add("has-illustration");
+      document.querySelector(".scenario-illustration").hidden = false;
       let description = scenario.description(name);
       if (scenarioIndex === 1 && childProfile.foods) description += " The parent lists these familiar foods: " + childProfile.foods;
       document.querySelector(".scenario-description").textContent = description;

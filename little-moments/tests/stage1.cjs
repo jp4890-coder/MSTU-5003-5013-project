@@ -61,8 +61,9 @@ const invitation = profile => 'LM1.' + Buffer.from(JSON.stringify({ version: 1, 
       await page.locator('#invitation-input').fill(invitation(profile));
       await page.locator('#invitation-form button').click();
       for (let scenario = 0; scenario < 3; scenario++) {
-        assert.equal(await page.locator('.scenario-illustration').isVisible(), scenario === 2);
-        if (scenario === 2) {
+        assert.equal(await page.locator('.scenario-illustration').isVisible(), true);
+        assert.match(await page.locator('.scenario-illustration img').getAttribute('src'), new RegExp(['first-day-moment', 'mealtime-moment', 'bedtime-moment'][scenario]));
+        {
           await page.locator('.scenario-illustration img').evaluate(image => image.decode());
           assert.ok(await page.locator('.scenario-illustration img').evaluate(image => image.naturalWidth > 0));
         }
@@ -90,8 +91,9 @@ const invitation = profile => 'LM1.' + Buffer.from(JSON.stringify({ version: 1, 
       await page.locator('#invitation-input').fill(invitation(variant));
       await page.locator('#invitation-form button').click();
       for (let scenario = 0; scenario < 3; scenario++) {
-        assert.equal(await page.locator('.scenario-illustration').isVisible(), scenario === 2);
-        if (scenario === 2) {
+        assert.equal(await page.locator('.scenario-illustration').isVisible(), true);
+        assert.match(await page.locator('.scenario-illustration img').getAttribute('src'), new RegExp(['first-day-moment', 'mealtime-moment', 'bedtime-moment'][scenario]));
+        {
           await page.locator('.scenario-illustration img').evaluate(image => image.decode());
           assert.ok(await page.locator('.scenario-illustration img').evaluate(image => image.naturalWidth > 0));
         }

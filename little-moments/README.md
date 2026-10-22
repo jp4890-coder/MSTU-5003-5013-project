@@ -32,9 +32,9 @@ The homepage markup and styling have been restored to the original pre-session v
 
 ## Bedtime illustration and response choices
 
-The bedtime moment pairs a short personalized situation with a compact illustration: beside the text on desktop, below it on mobile. `images/bedtime-moment.png` is an AI-generated fictional illustration, not a portrait or a prediction. It shows the situation rather than a preferred response.
+All three moments pair their situation with a matching compact illustration: beside the text on desktop, below it on mobile. The files in `images/` are AI-generated fictional illustrations, not portraits or predictions. Each depicts its situation rather than a preferred response; the mealtime picture is not a recommendation about suitable foods.
 
-All three responses have reasonable intentions: help finish a small part of play, offer a familiar next step, or offer reassurance. Brief feedback connects parent-reported routines and settling preferences to both a possible benefit and a limitation. The interaction remains one decision with optional comparison. The homepage, First Day Together, and Mealtime remain unchanged.
+All three responses have reasonable intentions: help finish a small part of play, offer a familiar next step, or offer reassurance. Brief feedback connects parent-reported routines and settling preferences to both a possible benefit and a limitation. The interaction remains one decision with optional comparison. The homepage and scenario interactions remain unchanged; First Day Together and Mealtime now also have matching illustrations.
 
 ## AI assistance
 
