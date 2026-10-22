@@ -30,6 +30,12 @@ Before real use, instructional review must confirm that the three situations, re
 
 The homepage markup and styling have been restored to the original pre-session version. Stage 1 validation and session safeguards remain in place for the application. Earlier design experiments remain available in Git history.
 
+## Bedtime illustration and response choices
+
+The bedtime moment pairs a short personalized situation with a compact illustration: beside the text on desktop, below it on mobile. `images/bedtime-moment.png` is an AI-generated fictional illustration, not a portrait or a prediction. It shows the situation rather than a preferred response.
+
+All three responses have reasonable intentions: help finish a small part of play, offer a familiar next step, or offer reassurance. Brief feedback connects parent-reported routines and settling preferences to both a possible benefit and a limitation. The interaction remains one decision with optional comparison. The homepage, First Day Together, and Mealtime remain unchanged.
+
 ## AI assistance
 
 ChatGPT/Codex assisted with layout planning, HTML/CSS, JavaScript interactions, and debugging. The student supplied the concept and paper sketch and directed iterative design revisions.

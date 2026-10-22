@@ -116,6 +116,17 @@
       text-transform: uppercase;
     }
 
+    /* A compact illustration supports the situation without adding another step. */
+    .scenario-scene.has-illustration { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 20px; align-items: center; }
+    .scenario-scene.has-illustration .scenario-description { margin: 0; }
+    .scenario-illustration { margin: 0; }
+    .scenario-illustration img { display: block; width: 100%; height: auto; border-radius: 12px; }
+    .scenario-illustration figcaption { font-size: 11px; color: var(--muted); line-height: 1.5; margin-top: 6px; }
+    @media (max-width: 650px) {
+      .scenario-scene.has-illustration { grid-template-columns: 1fr; gap: 12px; }
+      .scenario-illustration img { width: min(100%, 260px); max-height: 160px; object-fit: cover; margin: 0 auto; }
+    }
+
     .scenario-description {
       max-width: 640px;
       margin: 0 auto;
@@ -413,10 +424,16 @@
       <div class="scenario-steps" aria-hidden="true"><span></span><span></span><span></span></div>
       <h1 id="scenario-title">First Day Together</h1>
       <p class="scenario-question">What would you do?</p>
+      <div class="scenario-scene">
       <p class="scenario-description">
         Taeha’s mom has just left. Taeha stands quietly near the door,
         watching you. He isn’t crying, but he doesn’t approach you either.
       </p>
+        <figure class="scenario-illustration" hidden>
+          <img src="images/bedtime-moment.png" width="1448" height="1086" alt="A fictional child holding a block and rubbing an eye, with a caregiver nearby.">
+          <figcaption>Fictional illustration, not a portrait of your child.</figcaption>
+        </figure>
+      </div>
 
     </section>
 
@@ -868,13 +885,17 @@
         ]
       },
       {
-        title: "Time to Put Toys Away",
-        description: n => `${n} is absorbed in play when it is time to start the bedtime routine. When you mention putting toys away, ${n} holds onto a favorite toy.`,
-        options: n => [`Put the toys away immediately and begin the bedtime routine.`, `Give a short warning and offer ${n} a small choice about cleaning up.`, `Let ${n} keep playing and try bedtime much later.`],
-        feedback: (n, slow) => [
-          ["Make the change easier to follow", `A sudden stop may make it harder for ${n} to shift attention. Name what comes next and allow a brief moment to finish.`],
-          ["A predictable next step", `A short warning and small choice can give ${n} a role in the transition. Use the familiar bedtime steps described by the parent when available.`],
-          ["Balance flexibility and routine", `A little extra time may help ${n} finish playing, but an open-ended delay can make the next step unclear. Agree on a small stopping point and keep the routine recognizable.`]
+        title: "Time to Wind Down",
+        description: n => `${n} is still building a tower as bedtime approaches. When you mention the bedtime routine, ${n} holds on to a block.`,
+        options: n => [
+          `Help ${n} finish one small part of the tower, then begin the routine.`,
+          `Give a short warning, then offer a familiar next step.`,
+          `Pause the cleanup request and offer reassurance before trying again.`
+        ],
+        feedback: () => [
+          ["Find a small stopping point", "Finishing one small part may make the change easier to follow. Keep the ending clear: joining the play can also make it harder to stop."],
+          ["Make the next step familiar", "A short warning can make the change clearer. Check with the parent about a familiar settling activity; if a choice feels like another demand, offer one small step instead."],
+          ["Make room for reassurance", "Reassurance can leave room for connection before another request. Notice whether it is welcomed, then gently return to the familiar routine rather than leaving the transition open-ended."]
         ]
       }
     ];
@@ -886,6 +907,8 @@
       document.querySelector(".scenario-card").hidden = false;
       document.querySelector(".response-section").hidden = false;
       document.querySelector("#scenario-title").textContent = scenario.title;
+      document.querySelector(".scenario-scene").classList.toggle("has-illustration", scenarioIndex === 2);
+      document.querySelector(".scenario-illustration").hidden = scenarioIndex !== 2;
       let description = scenario.description(name);
       if (scenarioIndex === 1 && childProfile.foods) description += " The parent lists these familiar foods: " + childProfile.foods;
       document.querySelector(".scenario-description").textContent = description;
@@ -923,27 +946,20 @@
         }
       }
       if (scenarioIndex === 2) {
-        const cues = [];
-        if (hasAnswer("tiredSigns", "Rubs eyes")) cues.push("rubbing eyes");
-        if (hasAnswer("tiredSigns", "Yawns")) cues.push("yawning");
-        if (hasAnswer("tiredSigns", "Becomes quiet")) cues.push("growing quiet");
-        if (hasAnswer("tiredSigns", "Becomes fussy")) cues.push("becoming fussy");
-        if (hasAnswer("tiredSigns", "Seeks closeness")) cues.push("moving closer to you");
-        let sleepDescription = `${name} is playing as the familiar bedtime routine approaches.`;
-        if (cues.length) sleepDescription += ` You notice ${name} ${cues.join(" and ")}, signs the parent associates with tiredness.`;
-        sleepDescription += hasAnswer("settling", "Resists stopping play") ? ` When you mention putting toys away, ${name} holds onto a favorite toy.` : ` You need to help ${name} move from play toward settling down.`;
-        const napContext = { "No naps": "The parent reports no usual daytime nap.", "One nap": "The parent reports one usual daytime nap.", "Two naps": "The parent reports two usual daytime naps.", "Varies": "The parent reports that daytime naps vary." };
-        if (napContext[childProfile.naps]) sleepDescription += " " + napContext[childProfile.naps];
-        document.querySelector(".scenario-description").textContent = sleepDescription;
-        // Choose once: a reported book, then song, then quiet time. Both routine fields count.
+        // Use one reported tiredness cue; keep the situation short and observational.
+        const signs = [["Rubs eyes", "rubbing eyes"], ["Yawns", "yawning"], ["Becomes quiet", "growing quiet"], ["Becomes fussy", "becoming fussy"], ["Seeks closeness", "moving closer to you"]];
+        const cue = signs.find(([answer]) => hasAnswer("tiredSigns", answer));
+        document.querySelector(".scenario-description").textContent = cue
+          ? `${name} is ${cue[1]} but still building a tower. When you mention bedtime, ${name} holds on to a block.`
+          : scenario.description(name);
         let step = "a familiar quiet activity";
         if (hasAnswer("bedtimeRoutine", "Book") || hasAnswer("routines", "A book before bedtime")) step = "a bedtime book";
         else if (hasAnswer("bedtimeRoutine", "Song")) step = "a familiar bedtime song";
         else if (hasAnswer("bedtimeRoutine", "Quiet time")) step = "quiet time";
         options[1] = `Give a short warning, then offer ${step} and a small choice about starting it.`;
-        entries[1] = ["Follow a familiar routine", `Offering a short warning and ${step} connects the transition to a routine the parent reported. A small choice may help ${name} take part; watch how the child responds.`];
-        if (step === "a familiar quiet activity") entries[1][1] = `A short warning can make the transition clearer for ${name}. Check with the parent about which settling activity is familiar.`;
-        if (hasAnswer("settling", "Needs reassurance")) entries[0] = ["Make room for reassurance", `Putting toys away immediately may feel abrupt, especially because the parent says ${name} needs reassurance. Before ending play, explain what comes next, allow a brief finishing moment, and stay available.`];
+        if (step !== "a familiar quiet activity") entries[1] = ["Follow a familiar routine", `Offering ${step} connects the next step to a routine the parent reported. If a choice feels like another demand when ${name} is tired, offer one small step instead and watch the response.`];
+        if (hasAnswer("settling", "Resists stopping play")) entries[0] = ["Find a small stopping point", `The parent reports that stopping play can be difficult for ${name}. Agreeing on one last block may help, but joining in can also extend the game; keep the ending small and clear.`];
+        if (hasAnswer("settling", "Needs reassurance")) entries[2] = ["Make room for reassurance", `The parent says ${name} needs reassurance when settling. Offer support and notice whether it is welcomed, then gently return to the routine; reassurance does not have to mean delaying bedtime.`];
       }
       document.querySelectorAll(".response-option").forEach((label, index) => {
         const input = label.querySelector("input");

@@ -61,11 +61,17 @@ const invitation = profile => 'LM1.' + Buffer.from(JSON.stringify({ version: 1, 
       await page.locator('#invitation-input').fill(invitation(profile));
       await page.locator('#invitation-form button').click();
       for (let scenario = 0; scenario < 3; scenario++) {
+        assert.equal(await page.locator('.scenario-illustration').isVisible(), scenario === 2);
+        if (scenario === 2) {
+          await page.locator('.scenario-illustration img').evaluate(image => image.decode());
+          assert.ok(await page.locator('.scenario-illustration img').evaluate(image => image.naturalWidth > 0));
+        }
         for (let option = 0; option < 3; option++) {
           await page.locator('input[name="response"]').nth(option).check();
           await page.locator('#see-feedback').click();
           assert.ok((await page.locator('#feedback-explanation').innerText()).length > 30);
-          if (scenario === 2 && option === 0) assert.match(await page.locator('#feedback-explanation').innerText(), /immediately may feel abrupt/);
+          if (scenario === 2 && option === 0) assert.match(await page.locator('#feedback-explanation').innerText(), /stopping point|one last block|small part/i);
+          if (scenario === 2 && option === 2) assert.match(await page.locator('#feedback-explanation').innerText(), /parent says.*reassurance/);
           if (scenario === 2 && option === 1) {
             assert.match(await page.locator('.response-option').nth(1).innerText(), /bedtime book/);
             assert.match(await page.locator('#feedback-explanation').innerText(), /routine the parent reported/);
@@ -84,6 +90,11 @@ const invitation = profile => 'LM1.' + Buffer.from(JSON.stringify({ version: 1, 
       await page.locator('#invitation-input').fill(invitation(variant));
       await page.locator('#invitation-form button').click();
       for (let scenario = 0; scenario < 3; scenario++) {
+        assert.equal(await page.locator('.scenario-illustration').isVisible(), scenario === 2);
+        if (scenario === 2) {
+          await page.locator('.scenario-illustration img').evaluate(image => image.decode());
+          assert.ok(await page.locator('.scenario-illustration img').evaluate(image => image.naturalWidth > 0));
+        }
         for (let option = 0; option < 3; option++) {
           await page.locator('input[name="response"]').nth(option).check();
           await page.locator('#see-feedback').click();
